@@ -13,15 +13,14 @@
 
 # -b N, --batch-size N: Set the batch size for prompt processing (default: 2048). This large batch size benefits users who have BLAS installed and enabled it during the 
 # build. If you don't have BLAS enabled ("BLAS=0"), you can use a smaller number, such as 8, to see the prompt progress as it's evaluated in some situations.
+#-r "User:" -f prompts/chat-with-bob.txt
 
 cd `dirname $0`
 cd ..
+dir=$(pwd)     
     
-    #-r "User:" -f prompts/chat-with-bob.txt
-    
-    
-  /home/red/Documents/BUP_SRC/WORK/Projects/llama.cpp/main \
-  -m /home/red/Documents/BUP_SRC/WORK/Projects/llama.cpp/models/ruGPT/ruGPT-3.5-13B-Q8_0.gguf \
+  $dir/../llama.cpp/main \
+  -m $dir/../llama.cpp/models/ruGPT/ruGPT-3.5-13B-Q8_0.gguf \
   -c 2048 \
   -b 2048 \
   -n -2 \
@@ -29,5 +28,5 @@ cd ..
   --repeat_penalty 1.0 \
   --color \
   --interactive-first \
-  | tee /home/red/Documents/BUP_SRC/WORK/Projects/llama.cpp/output.txt    
+  | tee $dir/../llama.cpp/output.txt    
     
