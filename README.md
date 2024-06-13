@@ -5,3 +5,8 @@ Dependencies:
 -llama.cpp (one needs to download and to build it)
 -tgbot-cpp (one needs to download and to build+install it)
 
+Authenticate/Build/run:
+
+-create your own telegram bots (2 at the moment), obtain TG tokens and then create the files mytgbot/bot_token1, mytgbot/bot_token2 with the correspondent tokens
+-git clone mytgbot && cd mytgbot && mkdir build && cd build && cmake .. && make && ./mytgbot
+
