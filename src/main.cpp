@@ -19,6 +19,7 @@
 #include <random>
 #include <algorithm>
 #include <future>
+#include <filesystem>
 
 //dependencies exernal:
 
@@ -27,7 +28,7 @@
 #include <tgbot/tgbot.h>
 
 // #include <curl/curl.h> // REST API requests
-#include </home/red/Documents/BUP_SRC/WORK/Projects/cpp-subprocess/include/subprocess.hpp> // Bot LLM runs in llama.cpp
+#include "subprocess.hpp" // llm launcher
 //llama.cpp (should be built and installed) since the app is being called with bash script via subprocess
 
 using namespace std;
@@ -36,16 +37,16 @@ using namespace TgBot;
 const vector<string> trusted_chats_titles {"People_v_lodke",  //main 
                                            "People_v_vodke"}; //test
 
-const string projects_prefix {"/home/red/Documents/BUP_SRC/WORK/Projects/"}; //one should place it's own
 
-const string path_prefix {projects_prefix + "mytgbot/"}; //one should place it's own
-const string llama_output {projects_prefix + "llama.cpp/output.txt"}; //one should place it's own
-const std::string hexagrammsFile {path_prefix + "hexagramms.txt"}; 
-const string DBfile {path_prefix + "messages.txt"}; //chat all people messages storage
-const string ReminderFile {path_prefix + "reminder.txt"};//reminder feature storage
 
 const string bot1Name{"Чук"};
 const string bot2Name{"Гек"};
+
+string path_prefix {}; 
+string llama_output {};
+std::string hexagrammsFile {};
+string DBfile {}; 
+string ReminderFile {};
 
 #include "LLM_manager.h" 
 #include "Command_manager.h" 
@@ -55,6 +56,13 @@ const string bot2Name{"Гек"};
 #include "utils.h" 
 
 int main() {
+    const filesystem::path cwd = filesystem::current_path();
+    const string projects_prefix {cwd.string() + "/../../"}; 
+    path_prefix = projects_prefix + "mytgbot/"; //one should place it's own
+    llama_output = projects_prefix + "llama.cpp/output.txt"; //one should place it's own
+    hexagrammsFile = path_prefix + "hexagramms.txt";//just for fun- bot quotes ones when request storage DB matches
+    DBfile = path_prefix + "messages.txt"; //chat all people messages storage
+    ReminderFile = path_prefix + "reminder.txt";//reminder feature storage
 
     std::ifstream file(hexagrammsFile);
     std::vector<std::string> hexagramms;

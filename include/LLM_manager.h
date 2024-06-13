@@ -9,7 +9,7 @@ class LLM_manager{
         }
 
         void set_launcher(size_t index){
-            cout << __PRETTY_FUNCTION__ << " : llm_launcher=" << index << endl;
+            cout << /*__PRETTY_FUNCTION__ <<*/ " : llm_launcher" << index << endl;
 
             clear_output_file();
 
@@ -111,7 +111,6 @@ class LLM_manager{
         const size_t            m_output_max_bytes{8192};            
         const string            m_start_response_token{"<s>"};
         const string            m_end_response_token{"</s>"};
-
 };
 
 #endif
