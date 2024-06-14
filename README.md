@@ -6,9 +6,11 @@ Dependencies:
 
 -cpp-subprocess (as a header file already placed in project include dir)
 
--llama.cpp (one needs to download and to build it as well as to download any desirable LLM model(s))
+-llama.cpp (one needs to download repo https://github.com/ggerganov/llama.cpp and to build executable (result main exec file is being used as an LLM models launcher) as well as to download any desirable LLM model(s) file(s) like https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/blob/main/llama-2-7b-chat.Q3_K_L.gguf)
 
--tgbot-cpp (one needs to download and to build+install it)
+-tgbot-cpp (one needs to download repo https://github.com/reo7sp/tgbot-cpp and to build library libTgBot.a and to install it)
+
+-at least two created Telegram bots (use Telegram BotFather) and its token placed to mytgbot/bot_token1, bot_token2 files
 
 ---
 
