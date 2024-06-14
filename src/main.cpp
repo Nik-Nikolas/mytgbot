@@ -95,7 +95,7 @@ int main() {
         
     bot1.register_command(
     {req_token_dialog, 
-    "<подсказка> : запустит диалог ботов",
+    "<подсказка> : запустит LLM диалог ботов",
     [&](int64_t id, const string& req){
         auto temp_req = req;
         temp_req.replace(req.find(req_token_dialog),req_token_dialog.length(), "");   
