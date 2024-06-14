@@ -181,7 +181,7 @@ void canary_call(const Bot_verbose& bot) {
         cout << bot.getName() <<  message << endl;
         bot.sayWord(message);
 
-        ifstream file(ReminderFile);
+        ifstream file(reminderFile);
         std::ostringstream ss;
         ss << file.rdbuf();
         bot.sayWord(". Напоминания: " + ss.str());
@@ -226,5 +226,15 @@ bool is_command(const string& text){
             StringTools::startsWith(text,  "/llm4")||
             StringTools::startsWith(text,  "/llm5") ;
 }
+
+ void setup_paths(string& pathPrefix, string& llamaOutput, string& hexagrammsFile, string& DBfile, string& reminderFile){
+    const auto cwd = filesystem::current_path();
+    const string projects_prefix {cwd.string() + "/../../"}; 
+    pathPrefix = projects_prefix + "mytgbot/"; 
+    llamaOutput = projects_prefix + "llama.cpp/output.txt"; //one should place it's own or provide Projects/llama.cpp placement
+    hexagrammsFile = pathPrefix + "hexagramms.txt";//just for fun- bot quotes ones when request storage DB matches
+    DBfile = pathPrefix + "messages.txt"; //chat all people messages storage
+    reminderFile = pathPrefix + "reminder.txt";//reminder storage
+ }
 
 #endif

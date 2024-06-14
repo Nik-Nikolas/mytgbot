@@ -92,11 +92,11 @@ class LLM_manager{
 
     private:
         const vector<pair<string,pair<string,string>>> m_commands_register{
-        {"llm1", {"llama-2-7b OR DELETED", path_prefix + "llm/my_chat.sh"}},
-        {"llm2", {"llama-2-13b-chat.Q4_0 (ENG)", path_prefix + "llm/my_chat2.sh"}},
-        {"llm3", {"firefly-llama2-13b-chat.Q6_K (CHINESE)", path_prefix + "llm/my_chat3.sh"}},
-        {"llm4", {"llama2-13b-estopia.Q8_0 (ENG)", path_prefix + "llm/my_chat4_estopia_13_8K.sh"}},
-        {"llm5", {"ruGPT-3.5-13B-Q8_0 (RUS)", path_prefix + "llm/my_chat5_ruGPT_13.sh"}}
+        {"llm1", {"llama-2-7b OR DELETED", pathPrefix + "llm/my_chat.sh"}},
+        {"llm2", {"llama-2-13b-chat.Q4_0 (ENG)", pathPrefix + "llm/my_chat2.sh"}},
+        {"llm3", {"firefly-llama2-13b-chat.Q6_K (CHINESE)", pathPrefix + "llm/my_chat3.sh"}},
+        {"llm4", {"llama2-13b-estopia.Q8_0 (ENG)", pathPrefix + "llm/my_chat4_estopia_13_8K.sh"}},
+        {"llm5", {"ruGPT-3.5-13B-Q8_0 (RUS)", pathPrefix + "llm/my_chat5_ruGPT_13.sh"}}
         };
 
         const size_t            m_default_llm{3};            

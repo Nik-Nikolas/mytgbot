@@ -37,16 +37,14 @@ using namespace TgBot;
 const vector<string> trusted_chats_titles {"People_v_lodke",  //main 
                                            "People_v_vodke"}; //test
 
-
-
 const string bot1Name{"Чук"};
 const string bot2Name{"Гек"};
 
-string path_prefix {}; 
-string llama_output {};
-std::string hexagrammsFile {};
+string pathPrefix {}; 
+string llamaOutput {}; 
+string hexagrammsFile {};
 string DBfile {}; 
-string ReminderFile {};
+string reminderFile {};
 
 #include "LLM_manager.h" 
 #include "Command_manager.h" 
@@ -56,27 +54,17 @@ string ReminderFile {};
 #include "utils.h" 
 
 int main() {
-    const filesystem::path cwd = filesystem::current_path();
-    const string projects_prefix {cwd.string() + "/../../"}; 
-    path_prefix = projects_prefix + "mytgbot/"; //one should place it's own
-    llama_output = projects_prefix + "llama.cpp/output.txt"; //one should place it's own
-    hexagrammsFile = path_prefix + "hexagramms.txt";//just for fun- bot quotes ones when request storage DB matches
-    DBfile = path_prefix + "messages.txt"; //chat all people messages storage
-    ReminderFile = path_prefix + "reminder.txt";//reminder feature storage
-
-    std::ifstream file(hexagrammsFile);
-    std::vector<std::string> hexagramms;
-    prepare_hexagramms(hexagramms);
+    setup_paths(pathPrefix, llamaOutput, hexagrammsFile, DBfile, reminderFile);
 
     string trumpToken {};
     string bidenToken{};
 
     //get bots tokens from files
-    get_token(path_prefix + "bot_token1", trumpToken); // file path_prefix + "bot_token1" should present in binary root dir
-    get_token(path_prefix + "bot_token2", bidenToken);
+    get_token(pathPrefix + "bot_token1", trumpToken); // file path_prefix + "bot_token1" should present in binary root dir
+    get_token(pathPrefix + "bot_token2", bidenToken);
 
-    Bot_verbose bot1(trumpToken, bot1Name, llama_output);
-    Bot_verbose bot2(bidenToken, bot2Name, llama_output);
+    Bot_verbose bot1(trumpToken, bot1Name, llamaOutput);
+    Bot_verbose bot2(bidenToken, bot2Name, llamaOutput);
 
     const auto req_token_weather = bot1.getName() + " погоду";
     const auto req_token_joke = bot1.getName() + " шутку";
@@ -126,8 +114,8 @@ int main() {
 
         temp_req.replace(req.find(req_token_remind),req_token_remind.length(), "");  
 
-        file_write_line(ReminderFile, temp_req);          
-        ifstream f(ReminderFile);
+        file_write_line(reminderFile, temp_req);          
+        ifstream f(reminderFile);
         std::ostringstream ss;
         ss << f.rdbuf();
         bot1.sayWord(". Текущие напоминания: " + ss.str());
@@ -140,8 +128,8 @@ int main() {
         auto temp_req = req;
         temp_req.replace(req.find(req_token_forget),req_token_forget.length(), "");   
 
-        file_clear_line(ReminderFile, temp_req);   
-        ifstream f(ReminderFile);
+        file_clear_line(reminderFile, temp_req);   
+        ifstream f(reminderFile);
         std::ostringstream ss;
         ss << f.rdbuf();
         bot1.sayWord(". Текущие напоминания: " + ss.str()); 
@@ -182,6 +170,10 @@ int main() {
         temp_req.replace(req.find(req_token_trump_search),req_token_trump_search.length(), "");  
         string author, DBline;
         if(find_partial(temp_req, author, DBline)){
+
+            std::vector<std::string> hexagramms;
+            prepare_hexagramms(hexagramms);
+
             bot1.getApi().sendMessage(id, "Автор " + 
             author + 
             " уже высказывался на эту тему: \n" + 
