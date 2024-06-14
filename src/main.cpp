@@ -59,10 +59,9 @@ int main() {
     string trumpToken {};
     string bidenToken{};
 
-    //get bots tokens from files
+    //Aythenticate bots
     get_token(pathPrefix + "bot_token1", trumpToken); // file path_prefix + "bot_token1" should present in binary root dir
     get_token(pathPrefix + "bot_token2", bidenToken);
-
     Bot_verbose bot1(trumpToken, bot1Name, llamaOutput);
     Bot_verbose bot2(bidenToken, bot2Name, llamaOutput);
 
@@ -71,11 +70,11 @@ int main() {
     const auto req_token_dialog = bot1.getName() + " " + bot2.getName() + " ";
     const auto req_token_remind = bot1.getName() + " запомни" + " ";
     const auto req_token_forget = bot1.getName() + " забудь" + " ";
-    const auto req_token_trump_freeze = bot1.getName() + " замри";
-    const auto req_token_trump_start = bot1.getName() + " отомри";
-    const auto req_token_trump_req = bot1.getName() + " скажи" + " ";
-    const auto req_token_trump_search = bot1.getName() + " поищи" + " ";
-    const auto req_token_trump_canary = "/canary="s;
+    const auto req_token_freeze_1 = bot1.getName() + " замри";
+    const auto req_token_start_1 = bot1.getName() + " отомри";
+    const auto req_token_req_1 = bot1.getName() + " скажи" + " ";
+    const auto req_token_search_1 = bot1.getName() + " поищи" + " ";
+    const auto req_token_canary_1 = "/canary="s;
 
     bot1.register_command({
     req_token_weather, 
@@ -136,7 +135,7 @@ int main() {
     }});
 
     bot1.register_command({
-    req_token_trump_freeze,
+    req_token_freeze_1,
      ": замолчит",
     [&](int64_t id, const string& req){
         bot1.set_silent(true);
@@ -144,18 +143,18 @@ int main() {
     }});
 
     bot1.register_command({
-    req_token_trump_start, 
+    req_token_start_1, 
     ": начнет болтать снова",
     [&](int64_t id, const string& req){
         bot1.set_silent(false);
     }});
 
     bot1.register_command({
-    req_token_trump_req, 
+    req_token_req_1, 
     " <детально> <инструкция/команда>: триггернёт бота. <детально>-опция длинного ответа LLM (умолчательно ответ короткий), <инструкция/команда>- запрос (prompt) для LLM",
     [&](int64_t id, const string& req){
         auto temp_req = req;
-        temp_req.replace(req.find(req_token_trump_req),req_token_trump_req.length(), "");  
+        temp_req.replace(req.find(req_token_req_1),req_token_req_1.length(), "");  
 
         if(!bot1.is_silent()){                 
             bot1.start_llm(id, temp_req); 
@@ -163,11 +162,11 @@ int main() {
     }});
 
     bot1.register_command({
-    req_token_trump_search, 
+    req_token_search_1, 
     ": поищет совпадения в истории переписки",
     [&](int64_t id, const string& req){
         auto temp_req = req;
-        temp_req.replace(req.find(req_token_trump_search),req_token_trump_search.length(), "");  
+        temp_req.replace(req.find(req_token_search_1),req_token_search_1.length(), "");  
         string author, DBline;
         if(find_partial(temp_req, author, DBline)){
 
@@ -185,23 +184,23 @@ int main() {
 
     //canary= X is a pseudo command due to args followed by, so process it here (not in onCommand!)
     bot1.register_command({
-    req_token_trump_canary,
+    req_token_canary_1,
     ": устанавливает режим канарейки. canary= X: назначить режим канарейки с периодом Х сек.",
     [&](int64_t id, const string& req){
 
-        if(CommandParser::parseDelayMessage(req, req_token_trump_canary)){
+        if(CommandParser::parseDelayMessage(req, req_token_canary_1)){
             cout << bot1.getName() << " set canary delay: " << CommandParser::delayValue() << endl;
             bot1.setCanaryDelay(CommandParser::delayValue());
         }
     }});
 
-    const auto req_token_biden_freeze = bot2.getName() + " замри";
-    const auto req_token_biden_start = bot2.getName() + " отомри";
-    const auto req_token_biden_req = bot2.getName() + " скажи" + " ";
-    const auto req_token_biden_canary = "/canary="s;
+    const auto req_token_freeze_2 = bot2.getName() + " замри";
+    const auto req_token_start_2 = bot2.getName() + " отомри";
+    const auto req_token_req_2 = bot2.getName() + " скажи" + " ";
+    const auto req_token_canary_2 = "/canary="s;
 
     bot2.register_command({
-    req_token_biden_freeze,
+    req_token_freeze_2,
      ": замолчит",
     [&](int64_t id, const string& req){
         bot2.set_silent(true);
@@ -209,18 +208,18 @@ int main() {
     }});
 
     bot2.register_command({
-    req_token_biden_start, 
+    req_token_start_2, 
     ": начнет болтать снова",
     [&](int64_t id, const string& req){
         bot2.set_silent(false);
     }});
 
     bot2.register_command({
-    req_token_biden_req, 
+    req_token_req_2, 
     " <детально> <инструкция/команда>: триггернёт бота. <детально>-опция длинного ответа LLM (умолчательно ответ короткий), <инструкция/команда>- запрос (prompt) для LLM",
     [&](int64_t id, const string& req){
         auto temp_req = req;
-        temp_req.replace(req.find(req_token_biden_req),req_token_biden_req.length(), ""); 
+        temp_req.replace(req.find(req_token_req_2),req_token_req_2.length(), ""); 
 
         if(!bot2.is_silent()){                 
             bot2.start_llm(id, temp_req); 
@@ -229,11 +228,11 @@ int main() {
 
     //canary= X is a pseudo command due to args followed by, so process it here (not in onCommand!)
     bot2.register_command({
-    req_token_biden_canary,
+    req_token_canary_2,
     ": устанавливает режим канарейки. canary= X: назначить режим канарейки с периодом Х сек.",
     [&](int64_t id, const string& req){
 
-        if(CommandParser::parseDelayMessage(req, req_token_biden_canary)){
+        if(CommandParser::parseDelayMessage(req, req_token_canary_2)){
             cout << bot2.getName() << " set canary delay: " << CommandParser::delayValue() << endl;
             bot2.setCanaryDelay(CommandParser::delayValue());
         }
