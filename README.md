@@ -18,9 +18,11 @@ Authenticate/Build/run:
 
 -create your own telegram bots (2 at the moment), obtain TG tokens and then create the files mytgbot/bot_token1, mytgbot/bot_token2 with the correspondent tokens
 
--git clone mytgbot && cd mytgbot && mkdir build && cd build && cmake .. && make && ./mytgbot
+-make sure that Projects/tgbot-cpp and Projects/llama.cpp already cloned, built, deployed (libTgBot.a installed, any desirable models placed to Projects/llama.cpp/models,  llm/my_chat*.sh scripts tuned due to models files names)
 
--OPTIONAL tune my_chat*.sh llama launcher scripts for better performance
+-cd Projects && git clone mytgbot && cd mytgbot && mkdir build && cd build && cmake .. && make && ./mytgbot
+
+-OPTIONAL tune llm/my_chat*.sh llama launcher scripts for better performance
 
 ---
 
