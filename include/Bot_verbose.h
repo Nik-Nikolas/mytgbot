@@ -11,8 +11,8 @@ class Bot_verbose: public Bot{
         }        
 
         void sayWord(const string& word) const {  
-            if(m_id)        
-                getApi().sendMessage(m_id, m_name + word );
+            if(m_id)
+                getApi().sendMessage(m_id, word);
         }
 
         void saveID(std::int64_t id){
