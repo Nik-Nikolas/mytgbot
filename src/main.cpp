@@ -68,7 +68,8 @@ int main() {
     const auto req_token_weather = bot1.getName() + " погоду";
     const auto req_token_joke = bot1.getName() + " шутку";
     const auto req_token_dialog = bot1.getName() + " " + bot2.getName() + " ";
-    const auto req_token_remind = bot1.getName() + " запомни" + " ";
+    const auto req_token_remember = bot1.getName() + " запомни" + " ";
+    const auto req_token_remind = bot1.getName() + " напомни";
     const auto req_token_forget = bot1.getName() + " забудь" + " ";
     const auto req_token_freeze_1 = bot1.getName() + " замри";
     const auto req_token_start_1 = bot1.getName() + " отомри";
@@ -106,14 +107,24 @@ int main() {
     }});
                 
     bot1.register_command({
-    req_token_remind, 
+    req_token_remember, 
     ": запомнит напоминалку",
     [&](int64_t id, const string& req){
         auto temp_req = req;
 
-        temp_req.replace(req.find(req_token_remind),req_token_remind.length(), "");  
+        temp_req.replace(req.find(req_token_remember),req_token_remember.length(), "");  
 
         file_write_line(reminderFile, temp_req);          
+        ifstream f(reminderFile);
+        std::ostringstream ss;
+        ss << f.rdbuf();
+        bot1.sayWord(". Текущие напоминания: " + ss.str());
+    }});
+
+    bot1.register_command({
+    req_token_remind, 
+    ": напомнит напоминалку",
+    [&](int64_t id, const string& req){        
         ifstream f(reminderFile);
         std::ostringstream ss;
         ss << f.rdbuf();
