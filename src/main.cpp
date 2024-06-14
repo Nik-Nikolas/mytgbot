@@ -76,6 +76,7 @@ int main() {
     const auto req_token_req_1 = bot1.getName() + " скажи" + " ";
     const auto req_token_search_1 = bot1.getName() + " поищи" + " ";
     const auto req_token_canary_1 = "/canary="s;
+    const auto req_token_history = bot1.getName() + " историю";
 
     bot1.register_command({
     req_token_weather, 
@@ -203,6 +204,20 @@ int main() {
             cout << bot1.getName() << " set canary delay: " << CommandParser::delayValue() << endl;
             bot1.setCanaryDelay(CommandParser::delayValue());
         }
+    }});
+
+    bot1.register_command({
+    req_token_history, 
+    ": выведет историю переписки",
+    [&](int64_t id, const string& req){        
+        ifstream f(DBfile);
+        std::ostringstream ss;
+        ss << f.rdbuf();
+        auto s = ss.str();
+        const auto max_history_bytes{8192};
+        if(s.length() > max_history_bytes)
+            s = s.substr(s.length() - max_history_bytes,max_history_bytes);
+        bot1.sayWord(s);
     }});
 
     const auto req_token_freeze_2 = bot2.getName() + " замри";
