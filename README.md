@@ -20,7 +20,7 @@ Authenticate/Build/run:
 
 -make sure that Projects/tgbot-cpp and Projects/llama.cpp already cloned, built, deployed (libTgBot.a installed, any desirable models placed to Projects/llama.cpp/models,  llm/my_chat*.sh scripts tuned due to models files names)
 
--cd Projects && git clone mytgbot && cd mytgbot && mkdir build && cd build && cmake .. && make && ./mytgbot
+-cd Projects && git clone mytgbot && cd mytgbot && git submodule add https://github.com/google/googletest.git && mkdir build && cd build && cmake .. && make && ./mytgbot
 
 -OPTIONAL tune llm/my_chat*.sh llama launcher scripts for better performance
 
