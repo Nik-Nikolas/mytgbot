@@ -16,6 +16,9 @@ if (CURL_FOUND)
     add_definitions(-DHAVE_CURL)
 endif()
 
+add_subdirectory(googletest)
+add_subdirectory(tests)
+
 add_executable(mytgbot src/main.cpp)
 
 target_include_directories(mytgbot PUBLIC

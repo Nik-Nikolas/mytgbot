@@ -1,7 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-void get_token(const string& pathToken, string& token){
+void get_token(const std::string& pathToken, std::string& token){
 
     std::ifstream f(pathToken);
     std::ostringstream ss;
@@ -17,51 +17,51 @@ std::string select_random_line(std::vector<std::string> & lines){
     return lines[0];
 }
 
-void make_lower(string& str){
+void make_lower(std::string& str){
     std::transform(str.begin(), str.end(), str.begin(),
     [](unsigned char c){ return isalpha(c) ? std::tolower(c) : c; });
 }
 
-void file_write_line(const string& file, const string& str){
+void file_write_line(const std::string& file, const std::string& str){
 
     auto str_lower = str;
     make_lower(str_lower);
 
     replace(str_lower.begin(), str_lower.end(), '\n', ' ');
 
-    ofstream f;
-    f.open(file, ios::out | ios::app);
+    std::ofstream f;
+    f.open(file, std::ios::out | std::ios::app);
 
     if (!f) {
-        string error {"Unable to open file " + file};
-        cerr << error;
+        std::string error {"Unable to open file " + file};
+        std::cerr << error;
         throw runtime_error(error);
     }
 
     printf("File newline: %s\n", str_lower.c_str());
-    f << str_lower << endl;
+    f << str_lower << std::endl;
 }
 
-void file_clear_line(const string& file, const string& str, const string& temp = "temp.txt"){
+void file_clear_line(const std::string& file, const std::string& str, const std::string& temp = "temp.txt"){
 
-    string strNew = "";
-    ifstream filein(file); //File to read from
-    ofstream fileout(temp); //Temporary file
+    std::string strNew = "";
+    std::ifstream filein(file); //File to read from
+    std::ofstream fileout(temp); //Temporary file
     if(!filein)
     {
-        string error {"Unable to open file " + file};
+        std::string error {"Unable to open file " + file};
         cerr << error;
         throw runtime_error(error);
     }
 
     if(!fileout)
     {
-        string error {"Unable to open file " + temp};
+        std::string error {"Unable to open file " + temp};
         cerr << error;
-        throw runtime_error(error);
+        throw std::runtime_error(error);
     }
 
-    string strTemp;
+    std::string strTemp;
     while(getline(filein, strTemp))
     {
         printf("Process line: %s\n", strTemp.c_str());
@@ -83,11 +83,11 @@ void file_clear_line(const string& file, const string& str, const string& temp =
     dst << src.rdbuf();
 }
 
-bool is_secured_chat(const string& str){
+bool is_secured_chat(const std::string& str){
 
     for(const auto& el: trusted_chats_titles){        
         if(str == el){
-            cout << "Chat " << str << " is verified and trusted" << endl;
+            std::cout << "Chat " << str << " is verified and trusted" << std::endl;
             return true;
         }
     }
@@ -95,7 +95,7 @@ bool is_secured_chat(const string& str){
     return false;
 }
 
-bool find_partial(const string& request, string& author, string& DBline){
+bool find_partial(const std::string& request, std::string& author, std::string& DBline){
 
     if(request.empty()) 
         return false;
@@ -103,7 +103,7 @@ bool find_partial(const string& request, string& author, string& DBline){
     auto str_lower = request;
     make_lower(str_lower);
 
-    ifstream myfile(DBfile);
+    std::ifstream myfile(DBfile);
 
     if(myfile.is_open())
     {
@@ -146,7 +146,7 @@ bool find_partial(const string& request, string& author, string& DBline){
                 if(it != DBlineTokens.cend()){
 
                     ++countRequestTokens;
-                    cout << "found: " << el << " in line: " << curLine << endl; 
+                    std::cout << "found: " << el << " in line: " << curLine << std::endl; 
                     if(countRequestTokens >= tokens_min_match_amt){
                         myfile.close();
                         return true;
@@ -159,29 +159,29 @@ bool find_partial(const string& request, string& author, string& DBline){
         return false;
     }
     else {
-        cerr<<"Unable to open file";
+        std::cerr<<"Unable to open file";
         throw runtime_error("DB file is not ready.");
     }
 }
 
-string get_timestamp(){
+std::string get_timestamp(){
 
-    string output(25,'\0');
+    std::string output(25,'\0');
     time_t seconds = time(NULL);
     tm* timeinfo = localtime(&seconds);
     strcpy((char*)output.data(), asctime(timeinfo));
-    cout << output;
+    std::cout << output;
 
     return output;
 }
 
 void canary_call(const Bot_verbose& bot) {
     while (true) {
-        const string message {string(". mode: canary singing") + " delay=" + to_string(bot.canaryDelay()) + " sec."};
-        cout << bot.getName() <<  message << endl;
+        const std::string message {string(". mode: canary singing") + " delay=" + to_string(bot.canaryDelay()) + " sec."};
+        std::cout << bot.getName() <<  message << std::endl;
         bot.sayWord(message);
 
-        ifstream file(reminderFile);
+        std::ifstream file(reminderFile);
         std::ostringstream ss;
         ss << file.rdbuf();
         bot.sayWord(". Напоминания: " + ss.str());
@@ -217,7 +217,7 @@ void prepare_hexagramms(std::vector<std::string>& hexagramms){
     }
 }
 
-bool is_command(const string& text){
+bool is_command(const std::string& text){
 
      return StringTools::startsWith(text,  "/stat") ||
             StringTools::startsWith(text,  "/llm1") ||
@@ -227,9 +227,9 @@ bool is_command(const string& text){
             StringTools::startsWith(text,  "/llm5") ;
 }
 
- void setup_paths(string& pathPrefix, string& llamaOutput, string& hexagrammsFile, string& DBfile, string& reminderFile){
+ void setup_paths(std::string& pathPrefix, std::string& llamaOutput, std::string& hexagrammsFile, std::string& DBfile, std::string& reminderFile){
     const auto cwd = filesystem::current_path();
-    const string projects_prefix {cwd.string() + "/../../"}; 
+    const std::string projects_prefix {cwd.string() + "/../../"}; 
     pathPrefix = projects_prefix + "mytgbot/"; 
     llamaOutput = projects_prefix + "llama.cpp/output.txt"; //one should place it's own or provide Projects/llama.cpp placement
     hexagrammsFile = pathPrefix + "hexagramms.txt";//just for fun- bot quotes ones when request storage DB matches
