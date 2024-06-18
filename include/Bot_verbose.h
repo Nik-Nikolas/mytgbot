@@ -3,12 +3,23 @@
 
 #include "Command.h"
 
+
+// class IBot: public Bot{
+//     public:
+//         virtual ~IBot() = default;
+//         getApi()
+
+// }
+
+
+
+
 class Bot_verbose: public Bot{
 
     public:
 
         Bot_verbose(const string& token, const string& name, const string& llm_file): Bot(token), m_name(name), m_llm_file(llm_file){
-        }        
+        }
 
         void sayWord(const string& word) const {  
             if(m_id)
