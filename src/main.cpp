@@ -119,7 +119,7 @@ int main() {
         ifstream f(reminderFile);
         std::ostringstream ss;
         ss << f.rdbuf();
-        bot1.sayWord("Текущие напоминания: " + ss.str());
+        bot1.sayWord("Текущие напоминания: \n" + ss.str());
     }});
 
     bot1.register_command({
@@ -129,7 +129,7 @@ int main() {
         ifstream f(reminderFile);
         std::ostringstream ss;
         ss << f.rdbuf();
-        bot1.sayWord("Текущие напоминания: " + ss.str());
+        bot1.sayWord("Текущие напоминания: \n" + ss.str());
     }});
              
     bot1.register_command({
@@ -143,7 +143,7 @@ int main() {
         ifstream f(reminderFile);
         std::ostringstream ss;
         ss << f.rdbuf();
-        bot1.sayWord("Текущие напоминания: " + ss.str()); 
+        bot1.sayWord("Текущие напоминания: \n" + ss.str()); 
     }});
 
     bot1.register_command({
