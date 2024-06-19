@@ -1,7 +1,7 @@
 #ifndef COMMAND_MANAGER_H
 #define COMMAND_MANAGER_H
 
-class Command_manager{
+class CommandManager{
     public:
 
         static const vector<pair<string,pair<string,string>>>& get_register(){

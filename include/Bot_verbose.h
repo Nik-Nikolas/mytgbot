@@ -2,33 +2,28 @@
 #define BOT_VERBOSE_H
 
 #include "Command.h"
+#include <memory>
 
-
-// class IBot: public Bot{
-//     public:
-//         virtual ~IBot() = default;
-//         getApi()
-
-// }
-
-
-
-
-class Bot_verbose: public Bot{
+class BotVerbose{
 
     public:
 
-        Bot_verbose(const string& token, const string& name, const string& llm_file): Bot(token), m_name(name), m_llm_file(llm_file){
+        BotVerbose(std::shared_ptr<Bot> bot, const string& name, const string& llm_file): 
+        m_bot(bot), 
+        m_poll(*m_bot),
+        m_name(name), 
+        m_llm_file(llm_file){
+            m_bot->getApi().deleteWebhook();
         }
 
         void sayWord(const string& word) const {  
             if(m_id)
-                getApi().sendMessage(m_id, word);
+                m_bot->getApi().sendMessage(m_id, word);
         }
 
         void saveID(std::int64_t id){
             if(!m_id)
-                getApi().sendMessage(id, m_name + " инициирует ID: " + to_string(id));
+                m_bot->getApi().sendMessage(id, m_name + " инициирует ID: " + std::to_string(id));
 
             m_id = id;            
         }
@@ -49,79 +44,79 @@ class Bot_verbose: public Bot{
             m_name = n;
         }
 
-        void set_silent(bool flag){
-            m_is_silent = flag;
+        void setSilent(bool flag){
+            m_isSilent = flag;
         }
 
-        bool is_silent() const {
-            return m_is_silent;
+        bool isSilent() const {
+            return m_isSilent;
         }
 
-        LLM_manager& get_LLM_manager() {
+        LLM_manager& getLLMmanager() {
             return m_llm;
         }
 
-        void describe_LLM(int64_t chat_id){
+        void describeLLM(int64_t chat_id){
 
-            getApi().sendMessage(chat_id, "Текущая LLM модель: (" + 
+            m_bot->getApi().sendMessage(chat_id, "Текущая LLM модель: (" + 
             getName() + ") " +
-            get_LLM_manager().get_launcher_descr() + "\n\n" +
-            "запрос, суффикс: " + get_LLM_manager().get_current_llm_request_suffix() + "\n\n" +
-            "запрос, задержка, сек.: " + to_string(get_LLM_manager().get_launcher_delay().count()) + "\n\n" +            
-            "ответ, макс. байт: " + to_string(get_LLM_manager().get_output_max_bytes()) + "\n\n" +
-            "ответ, макс, сек.: " + to_string(get_LLM_manager().get_response_duration()));
+            getLLMmanager().geLauncherDescr() + "\n\n" +
+            "запрос, суффикс: " + getLLMmanager().getCurrentLLMRequestSuffix() + "\n\n" +
+            "запрос, задержка, сек.: " + to_string(getLLMmanager().geLauncherDelay().count()) + "\n\n" +            
+            "ответ, макс. байт: " + to_string(getLLMmanager().getOutputMaxBytes()) + "\n\n" +
+            "ответ, макс, сек.: " + to_string(getLLMmanager().getResponseDuration()));
         }
 
-        string start_llm(int64_t chat_id, string request){
+        string startLLM(int64_t chat_id, string request){
 
-            getApi().sendChatAction(chat_id, "typing");
+            m_bot->getApi().sendChatAction(chat_id, "typing");
             
             const auto token_detailed{"детально "s};
             
             if(StringTools::startsWith(request, token_detailed)){
-                get_LLM_manager().set_response_duration(60*6);
-                cout << "Set response duration: " << get_LLM_manager().get_response_duration() << endl;
+                getLLMmanager().setResponseDuration(60*6);
+                cout << "Set response duration: " << getLLMmanager().getResponseDuration() << endl;
                 request.replace(request.find(token_detailed),token_detailed.length(), ""); 
             }
             else{
-                get_LLM_manager().set_default_response_duration();                    
+                getLLMmanager().setDefaultResponseDuration();                    
             }
             
             cout << getName() << " got a request: " << request << endl;
 
-            subprocess::popen cmd(get_LLM_manager().get_launcher(), {});
-            request.append(get_LLM_manager().get_current_llm_request_suffix());
+            subprocess::popen cmd(getLLMmanager().geLauncher(), {});
+            request.append(getLLMmanager().getCurrentLLMRequestSuffix());
 
-            cout << getName() << " processing request with: " << get_LLM_manager().get_launcher() <<  endl;
+            cout << getName() << " processing request with: " << getLLMmanager().geLauncher() <<  endl;
                         
-            this_thread::sleep_for(get_LLM_manager().get_launcher_delay());//allow LLM start in subprocess
+            this_thread::sleep_for(getLLMmanager().geLauncherDelay());//allow LLM start in subprocess
             cmd.in() << request.c_str() << std::endl;
 
             size_t cycles{0};
 
             string response{};
             while(true){
-                getApi().sendChatAction(chat_id, "typing");
+                m_bot->getApi().sendChatAction(chat_id, "typing");
 
-                ifstream file(get_LLM_manager().get_output_file());
+                ifstream file(getLLMmanager().getOutputFile());
                 std::ostringstream ss;
 
                 ss << file.rdbuf();
                 auto output = ss.str();
 
-                auto it = output.find(get_LLM_manager().get_end_response_token());
+                auto it = output.find(getLLMmanager().getEndResponseToken());
                 if(it != string::npos){
                     cout << "Stopped. Found end of LLM output." << endl;
                     cmd.close();
                     response = output;
                     break;                
-                }else if(output.size() > get_LLM_manager().get_output_max_bytes()){
-                    cout << "Stopped. Detected EXCESSIVE response size, bytes > " << get_LLM_manager().get_output_max_bytes() << endl;
+                }else if(output.size() > getLLMmanager().getOutputMaxBytes()){
+                    cout << "Stopped. Detected EXCESSIVE response size, bytes > " << getLLMmanager().getOutputMaxBytes() << endl;
                     cmd.close();
                     response = output;
                     break;
-                }else if(cycles > get_LLM_manager().get_response_duration()){
-                    cout << "Stopped. Detected EXCESSIVE processing time, seconds > " << get_LLM_manager().get_response_duration() << endl;
+                }else if(cycles > getLLMmanager().getResponseDuration()){
+                    cout << "Stopped. Detected EXCESSIVE processing time, seconds > " << getLLMmanager().getResponseDuration() << endl;
                     cmd.close();
                     response = output;
                     break;
@@ -130,16 +125,16 @@ class Bot_verbose: public Bot{
                     ++cycles;
                     this_thread::sleep_for(1s);
                     cout << "Output= " << output << endl;
-                    cout << "Wait for LLM complete response ... " << cycles << "/" << get_LLM_manager().get_response_duration() << endl;
+                    cout << "Wait for LLM complete response ... " << cycles << "/" << getLLMmanager().getResponseDuration() << endl;
                 }
             }
 
-            auto it = response.find(get_LLM_manager().get_start_response_token());
+            auto it = response.find(getLLMmanager().getStartResponseToken());
             if(it != string::npos)
-                response.replace(response.find(get_LLM_manager().get_start_response_token()),get_LLM_manager().get_start_response_token().length(),"");    
-            it = response.find(get_LLM_manager().get_end_response_token());
+                response.replace(response.find(getLLMmanager().getStartResponseToken()),getLLMmanager().getStartResponseToken().length(),"");    
+            it = response.find(getLLMmanager().getEndResponseToken());
             if(it != string::npos)           
-                response.replace(response.find(get_LLM_manager().get_end_response_token()),get_LLM_manager().get_end_response_token().length(),"");    
+                response.replace(response.find(getLLMmanager().getEndResponseToken()),getLLMmanager().getEndResponseToken().length(),"");    
 
             cout << getName() << " processed the request. Response is: " << response << endl;
 
@@ -149,12 +144,12 @@ class Bot_verbose: public Bot{
             }
 
             cout << getName() << " sending the answer ...: " << response << endl;
-            getApi().sendMessage(chat_id, response); 
+            m_bot->getApi().sendMessage(chat_id, response); 
 
             return response;
         }
 
-        void register_command(const Command& c){
+        void registerCommand(const Command& c){
             m_commands.push_back(c);
         }
 
@@ -162,7 +157,7 @@ class Bot_verbose: public Bot{
             return m_commands;
         }
 
-        void process_command(int64_t chat_id, const string& req){
+        void processCommand(int64_t chat_id, const string& req){
 
             for(const auto& el: m_commands){
                 if(StringTools::startsWith(req, el.m_command)){
@@ -171,15 +166,33 @@ class Bot_verbose: public Bot{
             }
         }
 
+        auto& getApi(){
+            return m_bot->getApi();
+        }
+
+        auto& getEvents(){
+            return m_bot->getEvents();
+        }
+
+        auto& getNativeBot(){
+            return m_bot;
+        }
+
+        void startPoll(){
+            m_poll.start();
+        }
+
     private:
 
-        bool            m_is_silent{false};
-        std::string     m_name;
-        std::int64_t    m_id{0};
-        std::int64_t    m_canary_delay_seconds{3600 * 12};
-        std::string     m_llm_file{};
-        vector<Command> m_commands;
-        LLM_manager     m_llm{m_llm_file};
+        std::shared_ptr<Bot>    m_bot;
+        TgLongPoll              m_poll;
+        bool                    m_isSilent{false};
+        std::string             m_name;
+        std::int64_t            m_id{0};
+        std::int64_t            m_canary_delay_seconds{3600 * 12};
+        std::string             m_llm_file{};
+        vector<Command>         m_commands;
+        LLM_manager             m_llm{m_llm_file};
 };
 
 #endif

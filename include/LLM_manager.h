@@ -5,13 +5,13 @@ class LLM_manager{
     public:
 
         LLM_manager(const string& f): m_output_file{f}{
-            set_launcher(m_default_llm);
+            setLauncher(m_default_llm);
         }
 
-        void set_launcher(size_t index){
+        void setLauncher(size_t index){
             cout << /*__PRETTY_FUNCTION__ <<*/ " : llm_launcher" << index << endl;
 
-            clear_output_file();
+            clearOutputFile();
 
             switch(index){
                 case 0:  //fall through
@@ -36,57 +36,57 @@ class LLM_manager{
             }
         }
 
-        void clear_output_file(){
+        void clearOutputFile(){
             fstream ofs;
             ofs.open(m_output_file, ios::out | ios::trunc);
             ofs << " ";
         }
 
-        string get_launcher(){
+        string geLauncher(){
             return m_launcher;
         }
 
-        string get_launcher_descr(){
+        string geLauncherDescr(){
             return m_descr;
         }
 
-        const vector<pair<string,pair<string,string>>>& get_all_descr(){
+        const vector<pair<string,pair<string,string>>>& getAllDescr(){
             return m_commands_register;
         }
 
-        string get_output_file(){
+        string getOutputFile(){
             return m_output_file;
         }
 
-        size_t get_output_max_bytes(){
+        size_t getOutputMaxBytes(){
             return m_output_max_bytes;
         }
 
-        string get_start_response_token(){
+        string getStartResponseToken(){
             return m_start_response_token;
         }
 
-        string get_end_response_token(){
+        string getEndResponseToken(){
             return m_end_response_token;
         }
 
-        std::chrono::seconds get_launcher_delay(){
+        std::chrono::seconds geLauncherDelay(){
             return m_launcher_delay;
         }
 
-        string get_current_llm_request_suffix(){
+        string getCurrentLLMRequestSuffix(){
             return m_request_suffix;
         }
 
-        size_t get_response_duration(){
+        size_t getResponseDuration(){
             return m_response_duration;
         }
 
-        void set_response_duration(size_t d){
+        void setResponseDuration(size_t d){
             m_response_duration = d;
         }
 
-        void set_default_response_duration(){
+        void setDefaultResponseDuration(){
             m_response_duration = m_response_default_duration;
         }     
 

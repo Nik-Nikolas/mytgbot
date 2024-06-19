@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <exception>
 #include <iterator>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <chrono>
@@ -56,14 +57,18 @@ string reminderFile {};
 int main() {
     setup_paths(pathPrefix, llamaOutput, hexagrammsFile, DBfile, reminderFile);
 
-    string trumpToken {};
-    string bidenToken{};
+    string botToken1 {};
+    string botToken2{};
 
     //Aythenticate bots
-    get_token(pathPrefix + "bot_token1", trumpToken); // file path_prefix + "bot_token1" should present in binary root dir
-    get_token(pathPrefix + "bot_token2", bidenToken);
-    Bot_verbose bot1(trumpToken, bot1Name, llamaOutput);
-    Bot_verbose bot2(bidenToken, bot2Name, llamaOutput);
+    get_token(pathPrefix + "bot_token1", botToken1); // file path_prefix + "bot_token1" should present in binary root dir
+    get_token(pathPrefix + "bot_token2", botToken2);
+    
+    auto silentBot1 = std::make_shared<Bot>(botToken1);
+    auto silentBot2 = std::make_shared<Bot>(botToken2);
+
+    BotVerbose bot1(silentBot1, bot1Name, llamaOutput);
+    BotVerbose bot2(silentBot2, bot2Name, llamaOutput);
 
     const auto req_token_weather = bot1.getName() + " погоду";
     const auto req_token_joke = bot1.getName() + " шутку";
@@ -78,22 +83,22 @@ int main() {
     const auto req_token_canary_1 = "/canary="s;
     const auto req_token_history = bot1.getName() + " историю";
 
-    bot1.register_command({
+    bot1.registerCommand({
     req_token_weather, 
     ": покажет погоду",
     [&](int64_t id, const string& req){
         const auto current = "latitude=44.0486&longitude=43.0594&current=rain,temperature_2m,wind_speed_10m"s;
-        bot1.getApi().sendMessage(id, "Weather:\n" + CURL_helper::GET("https://api.open-meteo.com/v1/forecast?" + current)); 
+        bot1.getApi().sendMessage(id, "Weather:\n" + CURLHelper::GET("https://api.open-meteo.com/v1/forecast?" + current)); 
     }});
 
-    bot1.register_command({
+    bot1.registerCommand({
     req_token_joke, 
     ": скажет шутку",
     [&](int64_t id, const string& req){
-        bot1.getApi().sendMessage(id, CURL_helper::GET("https://official-joke-api.appspot.com/random_joke")); 
+        bot1.getApi().sendMessage(id, CURLHelper::GET("https://official-joke-api.appspot.com/random_joke")); 
     }});
         
-    bot1.register_command(
+    bot1.registerCommand(
     {req_token_dialog, 
     "<подсказка> : запустит LLM диалог ботов",
     [&](int64_t id, const string& req){
@@ -102,12 +107,12 @@ int main() {
 
         std::size_t count_max{5};
         while(count_max--){
-            auto res = bot1.start_llm(id, temp_req);      
-            temp_req = bot2.start_llm(id, res); 
+            auto res = bot1.startLLM(id, temp_req);      
+            temp_req = bot2.startLLM(id, res); 
         }
     }});
                 
-    bot1.register_command({
+    bot1.registerCommand({
     req_token_remember, 
     ": запомнит напоминалку",
     [&](int64_t id, const string& req){
@@ -122,7 +127,7 @@ int main() {
         bot1.sayWord("Текущие напоминания: \n" + ss.str());
     }});
 
-    bot1.register_command({
+    bot1.registerCommand({
     req_token_remind, 
     ": напомнит напоминалку",
     [&](int64_t id, const string& req){        
@@ -132,7 +137,7 @@ int main() {
         bot1.sayWord("Текущие напоминания: \n" + ss.str());
     }});
              
-    bot1.register_command({
+    bot1.registerCommand({
     req_token_forget, 
     ": забудет напоминалку",
     [&](int64_t id, const string& req){
@@ -146,34 +151,34 @@ int main() {
         bot1.sayWord("Текущие напоминания: \n" + ss.str()); 
     }});
 
-    bot1.register_command({
+    bot1.registerCommand({
     req_token_freeze_1,
      ": замолчит",
     [&](int64_t id, const string& req){
-        bot1.set_silent(true);
+        bot1.setSilent(true);
         bot1.getApi().sendMessage(id, "Хорошо..."); 
     }});
 
-    bot1.register_command({
+    bot1.registerCommand({
     req_token_start_1, 
     ": начнет болтать снова",
     [&](int64_t id, const string& req){
-        bot1.set_silent(false);
+        bot1.setSilent(false);
     }});
 
-    bot1.register_command({
+    bot1.registerCommand({
     req_token_req_1, 
     " <детально> <инструкция/команда>: триггернёт бота. <детально>-опция длинного ответа LLM (умолчательно ответ короткий), <инструкция/команда>- запрос (prompt) для LLM",
     [&](int64_t id, const string& req){
         auto temp_req = req;
         temp_req.replace(req.find(req_token_req_1),req_token_req_1.length(), "");  
 
-        if(!bot1.is_silent()){                 
-            bot1.start_llm(id, temp_req); 
+        if(!bot1.isSilent()){                 
+            bot1.startLLM(id, temp_req); 
         }
     }});
 
-    bot1.register_command({
+    bot1.registerCommand({
     req_token_search_1, 
     ": поищет совпадения в истории переписки",
     [&](int64_t id, const string& req){
@@ -195,7 +200,7 @@ int main() {
     }});
 
     //canary= X is a pseudo command due to args followed by, so process it here (not in onCommand!)
-    bot1.register_command({
+    bot1.registerCommand({
     req_token_canary_1,
     ": устанавливает режим канарейки. canary= X: назначить режим канарейки с периодом Х сек.",
     [&](int64_t id, const string& req){
@@ -206,7 +211,7 @@ int main() {
         }
     }});
 
-    bot1.register_command({
+    bot1.registerCommand({
     req_token_history, 
     ": выведет историю переписки",
     [&](int64_t id, const string& req){        
@@ -225,35 +230,35 @@ int main() {
     const auto req_token_req_2 = bot2.getName() + " скажи" + " ";
     const auto req_token_canary_2 = "/canary="s;
 
-    bot2.register_command({
+    bot2.registerCommand({
     req_token_freeze_2,
      ": замолчит",
     [&](int64_t id, const string& req){
-        bot2.set_silent(true);
+        bot2.setSilent(true);
         bot2.getApi().sendMessage(id, "Хорошо..."); 
     }});
 
-    bot2.register_command({
+    bot2.registerCommand({
     req_token_start_2, 
     ": начнет болтать снова",
     [&](int64_t id, const string& req){
-        bot2.set_silent(false);
+        bot2.setSilent(false);
     }});
 
-    bot2.register_command({
+    bot2.registerCommand({
     req_token_req_2, 
     " <детально> <инструкция/команда>: триггернёт бота. <детально>-опция длинного ответа LLM (умолчательно ответ короткий), <инструкция/команда>- запрос (prompt) для LLM",
     [&](int64_t id, const string& req){
         auto temp_req = req;
         temp_req.replace(req.find(req_token_req_2),req_token_req_2.length(), ""); 
 
-        if(!bot2.is_silent()){                 
-            bot2.start_llm(id, temp_req); 
+        if(!bot2.isSilent()){                 
+            bot2.startLLM(id, temp_req); 
         }
     }});
 
     //canary= X is a pseudo command due to args followed by, so process it here (not in onCommand!)
-    bot2.register_command({
+    bot2.registerCommand({
     req_token_canary_2,
     ": устанавливает режим канарейки. canary= X: назначить режим канарейки с периодом Х сек.",
     [&](int64_t id, const string& req){
@@ -272,7 +277,7 @@ int main() {
 
     vector<pair<string,int>> users_stat;
 
-    bot1.getEvents().onCommand(Command_manager::get_register()[0].first, [&bot1, &users_stat, &start](Message::Ptr message) {
+    bot1.getEvents().onCommand(CommandManager::get_register()[0].first, [&bot1, &users_stat, &start](Message::Ptr message) {
 
         if(!is_secured_chat(message->chat->title))
             return;        
@@ -302,7 +307,7 @@ int main() {
         string commands;
         commands.append(
             "\n\n***********\nКоманды чата: \n\n");
-        for(auto& el: Command_manager::get_register()){
+        for(auto& el: CommandManager::get_register()){
             commands.append(string("/") + el.first + ": " + el.second.first + "\n");
         }
         commands.append("\n\n***********\nКоманды бота " + bot1.getName() + ": \n\n");
@@ -311,23 +316,23 @@ int main() {
             commands.append(el.m_command + el.m_desctipt + "\n");
         }
 
-        for(auto& el: bot1.get_LLM_manager().get_all_descr()){
+        for(auto& el: bot1.getLLMmanager().getAllDescr()){
             commands.append(string("/") + el.first + ": " + el.second.first + "\n");
         }
         bot1.getApi().sendMessage(message->chat->id, commands); 
 
-        bot1.describe_LLM(message->chat->id);
+        bot1.describeLLM(message->chat->id);
     });
 
     //setup LLM type switch processors
     size_t index{0};
-    for(const auto& el: bot1.get_LLM_manager().get_all_descr()){
+    for(const auto& el: bot1.getLLMmanager().getAllDescr()){
 
         bot1.getEvents().onCommand(el.first, [&bot1, index](Message::Ptr message) {
             if(!is_secured_chat(message->chat->title))
                 return;    
 
-            bot1.get_LLM_manager().set_launcher(index);
+            bot1.getLLMmanager().setLauncher(index);
         });
 
         ++index;
@@ -365,11 +370,11 @@ int main() {
         if(!req.empty()){
             file_write_line(DBfile, username + " : " + req + " : " + get_timestamp());
 
-            bot1.process_command(message->chat->id, req);
+            bot1.processCommand(message->chat->id, req);
         }
     });
 
-    bot2.getEvents().onCommand(Command_manager::get_register()[0].first, [&bot2](Message::Ptr message) {
+    bot2.getEvents().onCommand(CommandManager::get_register()[0].first, [&bot2](Message::Ptr message) {
 
         if(!is_secured_chat(message->chat->title))
             return;        
@@ -381,22 +386,22 @@ int main() {
             commands.append(el.m_command + el.m_desctipt + "\n");
         }
         
-        for(auto& el: bot2.get_LLM_manager().get_all_descr()){
+        for(auto& el: bot2.getLLMmanager().getAllDescr()){
             commands.append(string("/") + el.first + ": " + el.second.first + "\n");
         }        
         bot2.getApi().sendMessage(message->chat->id, commands);
 
-        bot2.describe_LLM(message->chat->id);
+        bot2.describeLLM(message->chat->id);
     });
 
     index = 0;
-    for(const auto& el: bot2.get_LLM_manager().get_all_descr()){
+    for(const auto& el: bot2.getLLMmanager().getAllDescr()){
 
         bot2.getEvents().onCommand(el.first, [&bot2, index](Message::Ptr message) {
             if(!is_secured_chat(message->chat->title))
                 return;    
 
-            bot2.get_LLM_manager().set_launcher(index);
+            bot2.getLLMmanager().setLauncher(index);
         });
         ++index;
     }
@@ -414,7 +419,7 @@ int main() {
         bot2.saveID(message->chat->id);
 
         if(!req.empty()){
-            bot2.process_command(message->chat->id, req);
+            bot2.processCommand(message->chat->id, req);
         }      
     });
 
@@ -424,21 +429,13 @@ int main() {
     });
  
     size_t count{0};
-    vector<TgLongPoll> polls;
-    vector<std::reference_wrapper<Bot_verbose>> bots{bot1, bot2};
-    for(auto& bot: bots){
-        bot.get().getApi().deleteWebhook();
-        polls.push_back(bot.get());
-    }
+    vector<std::reference_wrapper<BotVerbose>> bots{bot1, bot2};
     while (true) {
         try {
             while (true) {
-                for(auto& poll: polls){
-                    poll.start();
-                }
-
-                for(auto& bot: bots){
-                    cout << bot.get().getApi().getMe()->username <<  ": silence=" << bot.get().is_silent() << " canary delay=" << bot.get().canaryDelay() << "sec. Cycle#=" << count << endl;
+                for(auto& b: bots){
+                    b.get().startPoll();
+                    cout << b.get().getApi().getMe()->username <<  ": silence=" << b.get().isSilent() << " canary delay=" << b.get().canaryDelay() << "sec. Cycle#=" << count << endl;
                 }
                 ++count;
             }

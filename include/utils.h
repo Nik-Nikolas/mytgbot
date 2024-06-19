@@ -175,7 +175,7 @@ std::string get_timestamp(){
     return output;
 }
 
-void canary_call(const Bot_verbose& bot) {
+void canary_call(const BotVerbose& bot) {
     while (true) {
         const std::string message {string(". mode: canary singing") + " delay=" + to_string(bot.canaryDelay()) + " sec."};
         std::cout << bot.getName() <<  message << std::endl;

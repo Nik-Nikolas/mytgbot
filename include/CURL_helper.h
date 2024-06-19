@@ -1,7 +1,7 @@
 #ifndef CURL_HELPER_H
 #define CURL_HELPER_H
 
-class CURL_helper{
+class CURLHelper{
 public:
     static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp){
         ((std::string*)userp)->append((char*)contents, size * nmemb);
@@ -22,7 +22,7 @@ public:
             curl_easy_cleanup(curl);
         }
         else{
-            throw runtime_error("Error: CURL_helper::GET::curl malfunction.");
+            throw runtime_error("Error: CURLHelper::GET::curl malfunction.");
         }
 
         return readBuffer;
