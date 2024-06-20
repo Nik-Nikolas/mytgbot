@@ -1,3 +1,5 @@
+#ifndef BOT_MANAGER_H
+#define BOT_MANAGER_H
 
 class BotManager{
     public:
@@ -37,3 +39,4 @@ class BotManager{
         std::shared_ptr<Bot> m_bot;
         TgLongPoll           m_poll;
 };
+#endif
