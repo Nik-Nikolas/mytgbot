@@ -3,27 +3,31 @@
 
 #include "Command.h"
 #include <memory>
+#include "Bot_manager.h"
+
 
 class BotVerbose{
 
     public:
 
-        BotVerbose(std::shared_ptr<Bot> bot, const string& name, const string& llm_file): 
-        m_bot(bot), 
-        m_poll(*m_bot),
+        BotVerbose(
+        std::shared_ptr<Bot> bot, 
+        const string& name, 
+        const string& llm_file): 
+        m_botManager(bot),
         m_name(name), 
         m_llm_file(llm_file){
-            m_bot->getApi().deleteWebhook();
+            m_botManager.deleteWebhook();
         }
 
         void sayWord(const string& word) const {  
             if(m_id)
-                m_bot->getApi().sendMessage(m_id, word);
+                m_botManager.sendMessage(m_id, word);
         }
 
         void saveID(std::int64_t id){
             if(!m_id)
-                m_bot->getApi().sendMessage(id, m_name + " инициирует ID: " + std::to_string(id));
+                m_botManager.sendMessage(id, m_name + " инициирует ID: " + std::to_string(id));
 
             m_id = id;            
         }
@@ -58,7 +62,7 @@ class BotVerbose{
 
         void describeLLM(int64_t chat_id){
 
-            m_bot->getApi().sendMessage(chat_id, "Текущая LLM модель: (" + 
+            m_botManager.sendMessage(chat_id, "Текущая LLM модель: (" + 
             getName() + ") " +
             getLLMmanager().geLauncherDescr() + "\n\n" +
             "запрос, суффикс: " + getLLMmanager().getCurrentLLMRequestSuffix() + "\n\n" +
@@ -67,9 +71,10 @@ class BotVerbose{
             "ответ, макс, сек.: " + to_string(getLLMmanager().getResponseDuration()));
         }
 
+        template<typename subprocess>
         string startLLM(int64_t chat_id, string request){
 
-            m_bot->getApi().sendChatAction(chat_id, "typing");
+            m_botManager.sendChatAction(chat_id, "typing");
             
             const auto token_detailed{"детально "s};
             
@@ -84,7 +89,7 @@ class BotVerbose{
             
             cout << getName() << " got a request: " << request << endl;
 
-            subprocess::popen cmd(getLLMmanager().geLauncher(), {});
+            subprocess cmd(getLLMmanager().geLauncher(), {});
             request.append(getLLMmanager().getCurrentLLMRequestSuffix());
 
             cout << getName() << " processing request with: " << getLLMmanager().geLauncher() <<  endl;
@@ -96,7 +101,7 @@ class BotVerbose{
 
             string response{};
             while(true){
-                m_bot->getApi().sendChatAction(chat_id, "typing");
+                m_botManager.sendChatAction(chat_id, "typing");
 
                 ifstream file(getLLMmanager().getOutputFile());
                 std::ostringstream ss;
@@ -144,7 +149,7 @@ class BotVerbose{
             }
 
             cout << getName() << " sending the answer ...: " << response << endl;
-            m_bot->getApi().sendMessage(chat_id, response); 
+            m_botManager.sendMessage(chat_id, response); 
 
             return response;
         }
@@ -167,32 +172,26 @@ class BotVerbose{
         }
 
         auto& getApi(){
-            return m_bot->getApi();
+            return m_botManager.getApi();
         }
 
         auto& getEvents(){
-            return m_bot->getEvents();
-        }
-
-        auto& getNativeBot(){
-            return m_bot;
-        }
+            return m_botManager.getEvents();
+        }   
 
         void startPoll(){
-            m_poll.start();
+            m_botManager.startPoll();
         }
 
     private:
-
-        std::shared_ptr<Bot>    m_bot;
-        TgLongPoll              m_poll;
-        bool                    m_isSilent{false};
-        std::string             m_name;
-        std::int64_t            m_id{0};
-        std::int64_t            m_canary_delay_seconds{3600 * 12};
-        std::string             m_llm_file{};
-        vector<Command>         m_commands;
-        LLM_manager             m_llm{m_llm_file};
+        BotManager                          m_botManager;
+        bool                                m_isSilent{false};
+        std::string                         m_name;
+        std::int64_t                        m_id{0};
+        std::int64_t                        m_canary_delay_seconds{3600 * 12};
+        std::string                         m_llm_file{};
+        vector<Command>                     m_commands;
+        LLM_manager                         m_llm{m_llm_file};
 };
 
 #endif
