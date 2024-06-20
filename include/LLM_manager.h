@@ -9,9 +9,10 @@ class LLM_manager{
         }
 
         void setLauncher(size_t index){
-            cout << /*__PRETTY_FUNCTION__ <<*/ " : llm_launcher" << index << endl;
+            cout << __PRETTY_FUNCTION__ << " : llm_launcher=" << index << endl;
 
             clearOutputFile();
+            cout <<"Cleared LLM output file: " << m_output_file << endl;
 
             switch(index){
                 case 0:  //fall through
@@ -19,27 +20,29 @@ class LLM_manager{
                 case 2:  //fall through
                 default: //fall through
                 case 3:
-                m_launcher = m_commands_register[index].second.second;
-                m_descr = m_commands_register[index].second.first;
-                m_launcher_delay = std::chrono::seconds(5);
-                m_request_suffix = ". Напиши ответ по Русски";
-                m_response_duration = m_response_default_duration = 30;
-                break;
+                    m_launcher = m_commands_register[index].second.second;
+                    m_descr = m_commands_register[index].second.first;
+                    m_launcher_delay = std::chrono::seconds(5);
+                    m_request_suffix = ". Напиши ответ по Русски";
+                    m_response_duration = m_response_default_duration = 30;
+                    break;
 
                 case 4:
-                m_launcher = m_commands_register[index].second.second;
-                m_descr = m_commands_register[index].second.first;
-                m_launcher_delay = std::chrono::seconds(15);
-                m_request_suffix = "";
-                m_response_duration = m_response_default_duration = 60;
-                break;
+                    m_launcher = m_commands_register[index].second.second;
+                    m_descr = m_commands_register[index].second.first;
+                    m_launcher_delay = std::chrono::seconds(15);
+                    m_request_suffix = "";
+                    m_response_duration = m_response_default_duration = 60;
+                    break;
             }
+
+            cout <<"Setup current launcher: " << m_launcher << endl;
         }
 
         void clearOutputFile(){
             fstream ofs;
             ofs.open(m_output_file, ios::out | ios::trunc);
-            ofs << " ";
+            ofs << "";
         }
 
         string geLauncher(){

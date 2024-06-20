@@ -3,9 +3,9 @@
 
 #include <cstdint>
 struct Command{
-    string                                  m_command;
-    string                                  m_desctipt;
-    function<void(int64_t, const string&)>  m_action;
+    std::string                                             m_command;
+    std::string                                             m_desctipt;
+    std::function<void(std::int64_t, const std::string&)>   m_action;
 };
 
 #endif

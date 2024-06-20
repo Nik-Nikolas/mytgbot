@@ -5,7 +5,9 @@
 #include <memory>
 #include "Bot_manager.h"
 
+const string NotFoundResponse{" не нашел ответ."};
 
+template <typename BotManagerType>
 class BotVerbose{
 
     public:
@@ -17,6 +19,9 @@ class BotVerbose{
         m_botManager(bot),
         m_name(name), 
         m_llm_file(llm_file){
+        }
+
+        void init() {  
             m_botManager.deleteWebhook();
         }
 
@@ -145,7 +150,7 @@ class BotVerbose{
 
             if(response.empty()){
 
-                response.append(getName() + " не нашел ответ.");
+                response.append(getName() + NotFoundResponse);
             }
 
             cout << getName() << " sending the answer ...: " << response << endl;
@@ -183,8 +188,12 @@ class BotVerbose{
             m_botManager.startPoll();
         }
 
+        BotManagerType& getManager(){
+            return m_botManager;
+        }
+
     private:
-        BotManager                          m_botManager;
+        BotManagerType                      m_botManager;
         bool                                m_isSilent{false};
         std::string                         m_name;
         std::int64_t                        m_id{0};

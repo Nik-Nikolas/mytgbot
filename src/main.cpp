@@ -62,13 +62,15 @@ int main() {
 
     //Aythenticate bots
     get_token(pathPrefix + "bot_token1", botToken1); // file path_prefix + "bot_token1" should present in binary root dir
-    get_token(pathPrefix + "bot_token2", botToken2);
-    
+    get_token(pathPrefix + "bot_token2", botToken2);    
+
     auto silentBot1 = std::make_shared<Bot>(botToken1);
     auto silentBot2 = std::make_shared<Bot>(botToken2);
 
-    BotVerbose bot1(silentBot1, bot1Name, llamaOutput);
-    BotVerbose bot2(silentBot2, bot2Name, llamaOutput);
+    BotVerbose<BotManager> bot1(silentBot1, bot1Name, llamaOutput);
+    BotVerbose<BotManager> bot2(silentBot2, bot2Name, llamaOutput);
+    bot1.init();
+    bot2.init();
 
     const auto req_token_weather = bot1.getName() + " погоду";
     const auto req_token_joke = bot1.getName() + " шутку";
@@ -107,8 +109,8 @@ int main() {
 
         std::size_t count_max{5};
         while(count_max--){
-            auto res = bot1.startLLM(id, temp_req);      
-            temp_req = bot2.startLLM(id, res); 
+            auto res = bot1.startLLM<subprocess::popen>(id, temp_req);      
+            temp_req = bot2.startLLM<subprocess::popen>(id, res); 
         }
     }});
                 
@@ -174,7 +176,7 @@ int main() {
         temp_req.replace(req.find(req_token_req_1),req_token_req_1.length(), "");  
 
         if(!bot1.isSilent()){                 
-            bot1.startLLM(id, temp_req); 
+            bot1.startLLM<subprocess::popen>(id, temp_req); 
         }
     }});
 
@@ -253,7 +255,7 @@ int main() {
         temp_req.replace(req.find(req_token_req_2),req_token_req_2.length(), ""); 
 
         if(!bot2.isSilent()){                 
-            bot2.startLLM(id, temp_req); 
+            bot2.startLLM<subprocess::popen>(id, temp_req); 
         }
     }});
 
@@ -269,8 +271,8 @@ int main() {
         }
     }});
 
-    std::future<void> result = std::async(std::launch::async, canary_call, std::ref(bot1));
-    std::future<void> result2 = std::async(std::launch::async, canary_call, std::ref(bot2));
+    std::future<void> result = std::async(std::launch::async, canary_call<BotManager>, std::ref(bot1));
+    std::future<void> result2 = std::async(std::launch::async, canary_call<BotManager>, std::ref(bot2));
 
     srand(time(0)); 
     auto start = std::chrono::high_resolution_clock::now();
@@ -429,7 +431,7 @@ int main() {
     });
  
     size_t count{0};
-    vector<std::reference_wrapper<BotVerbose>> bots{bot1, bot2};
+    vector<std::reference_wrapper<BotVerbose<BotManager>>> bots{bot1, bot2};
     while (true) {
         try {
             while (true) {
