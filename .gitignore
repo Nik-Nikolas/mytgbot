@@ -19,6 +19,7 @@ cmake-build-*
 .vs/
 .vscode/
 build/
+debug/
 out/
 
 # MacOS dependecies
