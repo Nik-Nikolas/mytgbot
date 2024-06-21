@@ -176,7 +176,7 @@ std::string get_timestamp(){
 }
 
 template<typename BotManagerType>
-void canary_call(const BotVerbose<BotManagerType>& bot) {
+void canary_call(const BotVerbose<BotManagerType, subprocess::popen>& bot) {
     while (true) {
         const std::string message {string(". mode: canary singing") + " delay=" + to_string(bot.canaryDelay()) + " sec."};
         std::cout << bot.getName() <<  message << std::endl;

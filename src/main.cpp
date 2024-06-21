@@ -47,6 +47,7 @@ string hexagrammsFile {};
 string DBfile {}; 
 string reminderFile {};
 
+#include "subprocess.hpp" 
 #include "LLM_manager.h" 
 #include "Command_manager.h" 
 #include "Command_parser.h" 
@@ -67,8 +68,8 @@ int main() {
     auto silentBot1 = std::make_shared<Bot>(botToken1);
     auto silentBot2 = std::make_shared<Bot>(botToken2);
 
-    BotVerbose<BotManager> bot1(silentBot1, bot1Name, llamaOutput);
-    BotVerbose<BotManager> bot2(silentBot2, bot2Name, llamaOutput);
+    BotVerbose<BotManager, subprocess::popen> bot1(silentBot1, bot1Name, llamaOutput);
+    BotVerbose<BotManager, subprocess::popen> bot2(silentBot2, bot2Name, llamaOutput);
     bot1.init();
     bot2.init();
 
@@ -109,8 +110,8 @@ int main() {
 
         std::size_t count_max{5};
         while(count_max--){
-            auto res = bot1.startLLM<subprocess::popen>(id, temp_req);      
-            temp_req = bot2.startLLM<subprocess::popen>(id, res); 
+            auto res = bot1.startLLM(id, temp_req);      
+            temp_req = bot2.startLLM(id, res); 
         }
     }});
                 
@@ -176,7 +177,7 @@ int main() {
         temp_req.replace(req.find(req_token_req_1),req_token_req_1.length(), "");  
 
         if(!bot1.isSilent()){                 
-            bot1.startLLM<subprocess::popen>(id, temp_req); 
+            bot1.startLLM(id, temp_req); 
         }
     }});
 
@@ -255,7 +256,7 @@ int main() {
         temp_req.replace(req.find(req_token_req_2),req_token_req_2.length(), ""); 
 
         if(!bot2.isSilent()){                 
-            bot2.startLLM<subprocess::popen>(id, temp_req); 
+            bot2.startLLM(id, temp_req); 
         }
     }});
 
@@ -431,7 +432,7 @@ int main() {
     });
  
     size_t count{0};
-    vector<std::reference_wrapper<BotVerbose<BotManager>>> bots{bot1, bot2};
+    vector<std::reference_wrapper<BotVerbose<BotManager, subprocess::popen>>> bots{bot1, bot2};
     while (true) {
         try {
             while (true) {

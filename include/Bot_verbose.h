@@ -7,7 +7,7 @@
 
 const string NotFoundResponse{" не нашел ответ."};
 
-template <typename BotManagerType>
+template <typename BotManagerType, typename subproc>
 class BotVerbose{
 
     public:
@@ -76,7 +76,6 @@ class BotVerbose{
             "ответ, макс, сек.: " + to_string(getLLMmanager().getResponseDuration()));
         }
 
-        template<typename subprocess>
         string startLLM(int64_t chat_id, string request){
 
             m_botManager.sendChatAction(chat_id, "typing");
@@ -93,14 +92,14 @@ class BotVerbose{
             }
             
             cout << getName() << " got a request: " << request << endl;
-
-            subprocess cmd(getLLMmanager().geLauncher(), {});
+            std::vector<std::string> v;
+            m_subprocess = std::make_unique<subproc>(getLLMmanager().geLauncher(), v);
             request.append(getLLMmanager().getCurrentLLMRequestSuffix());
 
             cout << getName() << " processing request with: " << getLLMmanager().geLauncher() <<  endl;
                         
             this_thread::sleep_for(getLLMmanager().geLauncherDelay());//allow LLM start in subprocess
-            cmd.in() << request.c_str() << std::endl;
+            m_subprocess->in() << request.c_str() << std::endl;
 
             size_t cycles{0};
 
@@ -117,17 +116,17 @@ class BotVerbose{
                 auto it = output.find(getLLMmanager().getEndResponseToken());
                 if(it != string::npos){
                     cout << "Stopped. Found end of LLM output." << endl;
-                    cmd.close();
+                    m_subprocess->close();
                     response = output;
                     break;                
                 }else if(output.size() > getLLMmanager().getOutputMaxBytes()){
                     cout << "Stopped. Detected EXCESSIVE response size, bytes > " << getLLMmanager().getOutputMaxBytes() << endl;
-                    cmd.close();
+                    m_subprocess->close();
                     response = output;
                     break;
                 }else if(cycles > getLLMmanager().getResponseDuration()){
                     cout << "Stopped. Detected EXCESSIVE processing time, seconds > " << getLLMmanager().getResponseDuration() << endl;
-                    cmd.close();
+                    m_subprocess->close();
                     response = output;
                     break;
                 }
@@ -138,6 +137,8 @@ class BotVerbose{
                     cout << "Wait for LLM complete response ... " << cycles << "/" << getLLMmanager().getResponseDuration() << endl;
                 }
             }
+
+            m_subprocess.reset();
 
             auto it = response.find(getLLMmanager().getStartResponseToken());
             if(it != string::npos)
@@ -192,7 +193,12 @@ class BotVerbose{
             return m_botManager;
         }
 
+        std::unique_ptr<subproc>& getSubprocess(){
+            return m_subprocess;
+        }
+
     private:
+        std::unique_ptr<subproc>            m_subprocess;
         BotManagerType                      m_botManager;
         bool                                m_isSilent{false};
         std::string                         m_name;
