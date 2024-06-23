@@ -65,21 +65,21 @@ class BotManagerMocked: public BotManager{
         MOCK_METHOD(void, startPoll, (), (override)); 
 };
 
-class MockedSubprocess: public subprocess::popen{
+class MockedSubprocess{
 
     public:
-        MockedSubprocess(const std::string& s, std::vector<std::string> v):subprocess::popen("",{}){        
+        MockedSubprocess(const std::string& s, std::vector<std::string> v){        
         }
 
-        MOCK_METHOD(std::ostream&, in, ());
-        MOCK_METHOD(void, close, ());
+        // MOCK_METHOD(std::ostream&, in, ());
+        // MOCK_METHOD(void, close, ());
 
-        // std::ostream& in()  {
-        //     return cout;
-        // }
+        std::ostream& in()  {
+            return cout;
+        }
 
-        // void close(){
-        // }
+        void close(){
+        }
 };
 
 namespace mytgbottest{
@@ -91,16 +91,17 @@ namespace mytgbottest{
         {
             bot = std::make_shared<Bot>("12345");
 
-            llamaOutput = "temp_llama.txt";
+            llamaOutput = llamaFakeOutputFile;
             ofstream f (llamaOutput);
             botVerbose = make_unique<BotVerbose<BotManagerMocked, MockedSubprocess>>(bot, "bot", llamaOutput);
         }
 
         void TearDown()override
         {
-            std::remove("temp_llama.txt"); 
+            std::remove(llamaFakeOutputFile); 
         }
 
+        const std::string llamaFakeOutputFile{"temp_llama.txt"};
         std::shared_ptr<Bot> bot;
         std::unique_ptr<BotVerbose<BotManagerMocked, MockedSubprocess>> botVerbose;
     };
@@ -119,27 +120,27 @@ TEST_F(TestBotVerbose, sayWordFault) {
 }
 
 TEST_F(TestBotVerbose, sayWordSuccess) {
-    botVerbose->saveID(123);
-    EXPECT_CALL(botVerbose->getManager(), sendMessage(123,"meow")).Times(1);    
+    const auto ID {123};
+    EXPECT_CALL(botVerbose->getManager(), sendMessage(ID, botVerbose->getName() + " инициирует ID: " + to_string(ID))).Times(1);
+    botVerbose->saveID(ID);
+    
+    EXPECT_CALL(botVerbose->getManager(), sendMessage(ID,"meow")).Times(1);    
     botVerbose->sayWord("meow");
 }
 
 TEST_F(TestBotVerbose, startLLMSuccess) {
+    ::testing::InSequence seq; //below should be called in strict order
+
+    EXPECT_CALL(botVerbose->getManager(), deleteWebhook()).Times(1);
+    botVerbose->init();
+
     const auto ID {123};
+    EXPECT_CALL(botVerbose->getManager(), sendMessage(ID, botVerbose->getName() + " инициирует ID: " + to_string(ID))).Times(1);
     botVerbose->saveID(ID);
 
-    ::testing::InSequence seq; //below should be called in strict order
- 
-    ::testing::DefaultValue<std::ostream&>::Set(cout);//Setting the Default Value for a Return Type for MockedSubprocess in() function
-
-    EXPECT_CALL(botVerbose->getManager(), sendChatAction(ID, "typing")).Times(::testing::AtLeast(2));    
+    EXPECT_CALL(botVerbose->getManager(), sendChatAction(ID, "typing")).Times(1);   
+    EXPECT_CALL(botVerbose->getManager(), sendChatAction(ID, "typing")).Times(::testing::AtLeast(1));   
     EXPECT_CALL(botVerbose->getManager(), sendMessage(ID, botVerbose->getName() + NotFoundResponse)).Times(1);
-    EXPECT_CALL(botVerbose->getManager(), sendMessage(ID, botVerbose->getName() + NotFoundResponse)).Times(1);
-
-    // EXPECT_CALL(*botVerbose->getSubprocess(), in).Times(1);
-    // EXPECT_CALL(*botVerbose->getSubprocess(), close).Times(1);
-
-    ::testing::DefaultValue<std::ostream&>::Clear();//Unsetting the Default Value for a Return Type for MockedSubprocess in() function
 
     botVerbose->startLLM(ID, "meow");
 }

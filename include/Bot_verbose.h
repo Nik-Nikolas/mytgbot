@@ -23,6 +23,9 @@ class BotVerbose{
 
         void init() {  
             m_botManager.deleteWebhook();
+
+            std::vector<std::string> dummy;
+            m_subprocess = std::make_unique<subproc>(getLLMmanager().geLauncher(), dummy);
         }
 
         void sayWord(const string& word) const {  
@@ -92,8 +95,8 @@ class BotVerbose{
             }
             
             cout << getName() << " got a request: " << request << endl;
-            std::vector<std::string> v;
-            m_subprocess = std::make_unique<subproc>(getLLMmanager().geLauncher(), v);
+            std::vector<std::string> dummy;
+            m_subprocess.reset(new subproc(getLLMmanager().geLauncher(), dummy));
             request.append(getLLMmanager().getCurrentLLMRequestSuffix());
 
             cout << getName() << " processing request with: " << getLLMmanager().geLauncher() <<  endl;
