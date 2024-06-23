@@ -98,7 +98,7 @@ namespace mytgbottest{
 
         void TearDown()override
         {
-            std::remove(llamaFakeOutputFile); 
+            std::remove(llamaFakeOutputFile.c_str()); 
         }
 
         const std::string llamaFakeOutputFile{"temp_llama.txt"};
@@ -123,7 +123,7 @@ TEST_F(TestBotVerbose, sayWordSuccess) {
     const auto ID {123};
     EXPECT_CALL(botVerbose->getManager(), sendMessage(ID, botVerbose->getName() + " инициирует ID: " + to_string(ID))).Times(1);
     botVerbose->saveID(ID);
-    
+
     EXPECT_CALL(botVerbose->getManager(), sendMessage(ID,"meow")).Times(1);    
     botVerbose->sayWord("meow");
 }
