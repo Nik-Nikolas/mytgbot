@@ -206,7 +206,7 @@ class BotVerbose{
         bool                                m_isSilent{false};
         std::string                         m_name;
         std::int64_t                        m_id{0};
-        std::int64_t                        m_canary_delay_seconds{3600 * 12};
+        std::int64_t                        m_canary_delay_seconds{3600 * 6};
         std::string                         m_llm_file{};
         vector<Command>                     m_commands;
         LLM_manager                         m_llm{m_llm_file};
