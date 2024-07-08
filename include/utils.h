@@ -44,34 +44,32 @@ void file_write_line(const std::string& file, const std::string& str){
 
 void file_clear_line(const std::string& file, const std::string& str, const std::string& temp = "temp.txt"){
 
-    std::string strNew = "";
     std::ifstream filein(file); //File to read from
     std::ofstream fileout(temp); //Temporary file
-    if(!filein)
-    {
+    if(!filein){
         std::string error {"Unable to open file " + file};
         cerr << error;
         throw runtime_error(error);
     }
 
-    if(!fileout)
-    {
+    if(!fileout){
         std::string error {"Unable to open file " + temp};
         cerr << error;
         throw std::runtime_error(error);
     }
 
     std::string strTemp;
-    while(getline(filein, strTemp))
-    {
+    while(getline(filein, strTemp)){
         printf("Process line: %s\n", strTemp.c_str());
 
         if(strTemp == str){
             printf("Found match line: %s\n", str.c_str());
-            strTemp = strNew;
+            strTemp.clear();
         }
-        if(!strTemp.empty())
+
+        if(!strTemp.empty()){
             strTemp += "\n";
+        }
         
         fileout << strTemp;
     }
@@ -105,8 +103,7 @@ bool find_partial(const std::string& request, std::string& author, std::string& 
 
     std::ifstream myfile(DBfile);
 
-    if(myfile.is_open())
-    {
+    if(myfile.is_open()){
         const size_t token_min_size_bytes {8};
         const size_t tokens_min_match_amt {2};
         
