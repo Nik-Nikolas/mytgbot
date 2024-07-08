@@ -24,8 +24,9 @@ class BotVerbose{
         void init() {  
             m_botManager.deleteWebhook();
 
-            std::vector<std::string> dummy;
-            m_subprocess = std::make_unique<subproc>(getLLMmanager().geLauncher(), dummy);
+            //TODO is it legal here???
+            // std::vector<std::string> dummy;
+            // m_subprocess = std::make_unique<subproc>(getLLMmanager().geLauncher(), dummy);
         }
 
         void sayWord(const string& word) const {  
