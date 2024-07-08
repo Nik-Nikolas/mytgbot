@@ -156,9 +156,8 @@ int main() {
         if(isdigit(maybeDigit)) {
             file_clear_line(reminderFile, maybeDigit);
         }      
-            file_clear_line(reminderFile, temp_req);
         else{
-
+            file_clear_line(reminderFile, temp_req);
         }
         ifstream f(reminderFile);
         std::ostringstream ss;
