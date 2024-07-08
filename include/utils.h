@@ -81,6 +81,50 @@ void file_clear_line(const std::string& file, const std::string& str, const std:
     dst << src.rdbuf();
 }
 
+
+void file_clear_line(const std::string& file, const size_t index, const std::string& temp = "temp.txt"){
+
+    std::ifstream filein(file); //File to read from
+    std::ofstream fileout(temp); //Temporary file
+    if(!filein){
+        std::string error {"Unable to open file " + file};
+        cerr << error;
+        throw runtime_error(error);
+    }
+
+    if(!fileout){
+        std::string error {"Unable to open file " + temp};
+        cerr << error;
+        throw std::runtime_error(error);
+    }
+
+    std::string strTemp;
+    size_t curentLineIndex {0};
+    while(getline(filein, strTemp)){
+        printf("Process line: %s\n", strTemp.c_str());
+
+        if(curentLineIndex == index){
+            printf("Found match line: %s\n", str.c_str());
+            strTemp.clear();
+        }
+
+        ++curentLineIndex;
+
+        if(!strTemp.empty()){
+            strTemp += "\n";
+        }
+        
+        fileout << strTemp;
+    }
+    filein.close();
+    fileout.close();
+
+    std::ifstream  src(temp, std::ios::binary);
+    std::ofstream  dst(file,   std::ios::binary);
+    dst << src.rdbuf();
+}
+
+
 bool is_secured_chat(const std::string& str){
 
     for(const auto& el: trusted_chats_titles){        
