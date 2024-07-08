@@ -99,12 +99,12 @@ void file_clear_line(const std::string& file, const size_t index, const std::str
     }
 
     std::string strTemp;
-    size_t curentLineIndex {0};
+    size_t curentLineIndex {1};
     while(getline(filein, strTemp)){
         printf("Process line: %s\n", strTemp.c_str());
 
-        if(curentLineIndex == index){
-            printf("Found match index: %i\n", index);
+        if(curentLineIndex == index - 48){
+            printf("Found match index: %li\n", index - 48);
             strTemp.clear();
         }
 
