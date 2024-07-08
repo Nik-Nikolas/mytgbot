@@ -145,9 +145,17 @@ int main() {
     ": забудет напоминалку",
     [&](int64_t id, const string& req){
         auto temp_req = req;
-        temp_req.replace(req.find(req_token_forget),req_token_forget.length(), "");   
+        temp_req.replace(req.find(req_token_forget),req_token_forget.length(), "");
+        
+        const auto maybeDigit = static_cast<unsigned char>(temp_req.c_str()));
 
-        file_clear_line(reminderFile, temp_req);   
+        if(isdigit(maybeDigit)) {
+            file_clear_line(reminderFile, maybeDigit);
+        }      
+            file_clear_line(reminderFile, temp_req);
+        else{
+
+        }
         ifstream f(reminderFile);
         std::ostringstream ss;
         ss << f.rdbuf();
