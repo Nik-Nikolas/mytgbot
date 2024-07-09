@@ -226,7 +226,7 @@ void canary_call(const BotVerbose<BotManagerType, subprocess::popen>& bot) {
         std::ifstream file(reminderFile);
         std::ostringstream ss;
         ss << file.rdbuf();
-        bot.sayWord("Текущие напоминания: \n" + ss.str());
+        bot.sayWord("Текущие напоминания: \n\n" + ss.str());
 
         for(auto i=0;i<bot.canaryDelay();++i){
             std::this_thread::sleep_for(std::chrono::seconds(1));
