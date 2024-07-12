@@ -233,7 +233,7 @@ int main() {
         std::ostringstream ss;
         ss << f.rdbuf();
         auto s = ss.str();
-        const auto max_history_bytes{8192 * 4};
+        const auto max_history_bytes{8192};
         if(s.length() > max_history_bytes)
             s = s.substr(s.length() - max_history_bytes,max_history_bytes);
         bot1.sayWord(s);
