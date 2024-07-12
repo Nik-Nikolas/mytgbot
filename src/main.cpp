@@ -178,6 +178,7 @@ int main() {
     ": начнет болтать снова",
     [&](int64_t id, const string& req){
         bot1.setSilent(false);
+        bot2.getApi().sendMessage(id, "Хорошо..."); 
     }});
 
     bot1.registerCommand({
@@ -257,6 +258,7 @@ int main() {
     ": начнет болтать снова",
     [&](int64_t id, const string& req){
         bot2.setSilent(false);
+        bot2.getApi().sendMessage(id, "Хорошо..."); 
     }});
 
     bot2.registerCommand({
