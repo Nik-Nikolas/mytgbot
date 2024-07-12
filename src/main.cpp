@@ -117,7 +117,7 @@ int main() {
                 
     bot1.registerCommand({
     req_token_remember, 
-    ": запомнит напоминалку",
+    " <текст>: запомнит <текст>",
     [&](int64_t id, const string& req){
         auto temp_req = req;
 
@@ -142,7 +142,7 @@ int main() {
              
     bot1.registerCommand({
     req_token_forget, 
-    ": забудет напоминалку",
+    " <текст> или <индекс>: забудет <текст> или строку с номером <индекс>",
     [&](int64_t id, const string& req){
 
         auto temp_req = req;
