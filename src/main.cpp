@@ -151,15 +151,17 @@ int main() {
         if(temp_req.empty())
             return;
 
-        auto maybeDigit = static_cast<unsigned char>(temp_req[0]);
-
+        const auto maybeDigit = static_cast<unsigned char>(temp_req[0]);
+        size_t index = maybeDigit - 48;
         if(temp_req.size()== 2){
             const auto maybeDigit2 = static_cast<unsigned char>(temp_req[1]);
-            maybeDigit = (maybeDigit - 48) * 10 + (maybeDigit2 - 48);
+            index *= 10;
+            index += maybeDigit2 - 48;
+            std::cout << "index=" << index << std::endl;
         }
 
         if(isdigit(maybeDigit)) {
-            file_clear_line(reminderFile, maybeDigit);
+            file_clear_line(reminderFile, index);
         }      
         else{
             file_clear_line(reminderFile, temp_req);
