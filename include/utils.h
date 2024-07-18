@@ -29,6 +29,8 @@ void file_write_line(const std::string& file, const std::string& str){
 
     replace(str_lower.begin(), str_lower.end(), '\n', ' ');
 
+    str_lower.erase(std::remove(str_lower.begin(), str_lower.end(), '\n'), str_lower.end());
+
     std::ofstream f;
     f.open(file, std::ios::out | std::ios::app);
 
