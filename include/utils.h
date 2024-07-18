@@ -42,6 +42,27 @@ void file_write_line(const std::string& file, const std::string& str){
     f << str_lower << std::endl;
 }
 
+string file_read_enumerate_lines(const string& file){
+    ifstream f(file);
+    std::ostringstream ss;
+    ss << f.rdbuf();
+
+    std::string tempStr;
+    std::vector<std::string> fileLines;
+    std::stringstream mySstream(ss.str());
+    while(getline(mySstream, tempStr, '\n')) {
+        fileLines.push_back(tempStr);
+    }
+
+    string res{};
+    size_t count{1};
+    for(const auto& el: fileLines){
+        res+= (std::to_string(count++) + ". " + el + '\n');
+    }
+
+    return res;
+}
+
 void file_clear_line(const std::string& file, const std::string& str, const std::string& temp = "temp.txt"){
 
     std::ifstream filein(file); //File to read from

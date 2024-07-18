@@ -124,20 +124,15 @@ int main() {
         temp_req.replace(req.find(req_token_remember),req_token_remember.length(), "");  
 
         file_write_line(reminderFile, temp_req);          
-        ifstream f(reminderFile);
-        std::ostringstream ss;
-        ss << f.rdbuf();
-        bot1.sayWord("Текущие напоминания: \n\n" + ss.str());
+        
+        bot1.sayWord("Текущие напоминания: \n\n" + file_read_enumerate_lines(reminderFile));
     }});
 
     bot1.registerCommand({
     req_token_remind, 
     ": напомнит напоминалку",
     [&](int64_t id, const string& req){        
-        ifstream f(reminderFile);
-        std::ostringstream ss;
-        ss << f.rdbuf();
-        bot1.sayWord("Текущие напоминания: \n\n" + ss.str());
+        bot1.sayWord("Текущие напоминания: \n\n" + file_read_enumerate_lines(reminderFile));
     }});
              
     bot1.registerCommand({
@@ -167,10 +162,8 @@ int main() {
         else{
             file_clear_line(reminderFile, temp_req);
         }
-        ifstream f(reminderFile);
-        std::ostringstream ss;
-        ss << f.rdbuf();
-        bot1.sayWord("Текущие напоминания: \n\n" + ss.str()); 
+
+        bot1.sayWord("Текущие напоминания: \n\n" + file_read_enumerate_lines(reminderFile));
     }});
 
     bot1.registerCommand({
