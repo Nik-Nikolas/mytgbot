@@ -151,7 +151,12 @@ int main() {
         if(temp_req.empty())
             return;
 
-        const auto maybeDigit = static_cast<unsigned char>(temp_req[0]);
+        auto maybeDigit = static_cast<unsigned char>(temp_req[0]);
+
+        if(temp_req.size()== 2){
+            const auto maybeDigit2 = static_cast<unsigned char>(temp_req[1]);
+            maybeDigit = (maybeDigit - 48) * 10 + (maybeDigit2 - 48);
+        }
 
         if(isdigit(maybeDigit)) {
             file_clear_line(reminderFile, maybeDigit);
