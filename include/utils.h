@@ -94,8 +94,8 @@ void file_sort_lines(const string& file){
             std::ostream_iterator<std::string>(imploded, delim));
 
     auto res = imploded.str();
-    if(!res.empty())
-        res.pop_back();//last delim remove
+    // if(!res.empty())
+    //     res.pop_back();//last delim remove
 
     printf("File data: %s\n", res.c_str());
     fo << res;
