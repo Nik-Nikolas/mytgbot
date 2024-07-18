@@ -77,9 +77,10 @@ void file_sort_lines(const string& file){
     }
 
     std::sort(fileLines.begin(), fileLines.end());
+    fileLines.erase(unique(fileLines.begin(), fileLines.end()), fileLines.end());//remove duplicates
 
     std::ofstream fo;
-    fo.open(file, std::ios::out | std::ios::app);
+    fo.open(file, std::ios::out | std::ios::trunc);
 
     if (!fo) {
         std::string error {"Unable to open file " + file};
