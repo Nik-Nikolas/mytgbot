@@ -174,10 +174,17 @@ class BotVerbose{
 
         void processCommand(int64_t chat_id, const string& req){
 
+            auto isRegisteredProcessed{false};
             for(const auto& el: m_commands){
                 if(StringTools::startsWith(req, el.m_command)){
                     el.m_action(chat_id, req);
+                    isRegisteredProcessed = true;
+                    break;
                 }
+            }
+
+            if(!isRegisteredProcessed){
+                m_botManager.sendMessage(chat_id, "Wrong command: " + req); 
             }
         }
 
