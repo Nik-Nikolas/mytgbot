@@ -63,6 +63,43 @@ string file_read_enumerate_lines(const string& file){
     return res;
 }
 
+void file_sort_lines(const string& file){
+    ifstream f(file);
+    std::ostringstream ss;
+    ss << f.rdbuf();
+    f.close();
+
+    std::string tempStr;
+    std::vector<std::string> fileLines;
+    std::stringstream mySstream(ss.str());
+    while(getline(mySstream, tempStr, '\n')) {
+        fileLines.push_back(tempStr);
+    }
+
+    std::sort(fileLines.begin(), fileLines.end());
+
+    std::ofstream fo;
+    fo.open(file, std::ios::out | std::ios::app);
+
+    if (!fo) {
+        std::string error {"Unable to open file " + file};
+        std::cerr << error;
+        throw runtime_error(error);
+    }
+
+    const char* const delim = "\n";
+    std::ostringstream imploded;
+    std::copy(fileLines.begin(), fileLines.end(),
+            std::ostream_iterator<std::string>(imploded, delim));
+
+    auto res = imploded.str();
+    if(!res.empty())
+        res.pop_back();//last delim remove
+
+    printf("File data: %s\n", res.c_str());
+    fo << res;
+}
+
 void file_clear_line(const std::string& file, const std::string& str, const std::string& temp = "temp.txt"){
 
     std::ifstream filein(file); //File to read from

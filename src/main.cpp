@@ -123,7 +123,9 @@ int main() {
 
         temp_req.replace(req.find(req_token_remember),req_token_remember.length(), "");  
 
-        file_write_line(reminderFile, temp_req);          
+        file_write_line(reminderFile, temp_req);
+        
+        file_sort_lines(reminderFile);
         
         bot1.sayWord("Текущие напоминания: \n\n" + file_read_enumerate_lines(reminderFile));
     }});
@@ -162,6 +164,8 @@ int main() {
         else{
             file_clear_line(reminderFile, temp_req);
         }
+
+        file_sort_lines(reminderFile);
 
         bot1.sayWord("Текущие напоминания: \n\n" + file_read_enumerate_lines(reminderFile));
     }});
