@@ -185,6 +185,12 @@ class BotVerbose{
 
             if(!isRegisteredProcessed){
                 m_botManager.sendMessage(chat_id, "Wrong command: " + req); 
+
+                string commands{};
+                for(auto& el: get_commands()){
+                    commands.append(el.m_command + el.m_desctipt + "\n");
+                }
+                m_botManager.sendMessage(chat_id, "Bot commands: " + commands); 
             }
         }
 
