@@ -153,12 +153,13 @@ int main() {
 
         const auto maybeDigit = static_cast<unsigned char>(temp_req[0]);
         size_t index = maybeDigit - 48;
-        if(temp_req.size()== 2){
+        if(temp_req.size() == 2){
             const auto maybeDigit2 = static_cast<unsigned char>(temp_req[1]);
             index *= 10;
-            index += maybeDigit2 - 48;
-            std::cout << "index=" << index << std::endl;
+            index += (maybeDigit2 - 48);
         }
+
+        std::cout << "index=" << index << std::endl;
 
         if(isdigit(maybeDigit)) {
             file_clear_line(reminderFile, index);
