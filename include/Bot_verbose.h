@@ -174,6 +174,11 @@ class BotVerbose{
 
         void processCommand(int64_t chat_id, const string& req){
 
+
+            if(!StringTools::startsWith(req, getName())){
+                return;
+            }
+
             auto isRegisteredProcessed{false};
             for(const auto& el: m_commands){
                 if(StringTools::startsWith(req, el.m_command)){
