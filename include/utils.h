@@ -103,8 +103,8 @@ void file_clear_line(const std::string& file, const size_t index, const std::str
     while(getline(filein, strTemp)){
         printf("Process line: %s\n", strTemp.c_str());
 
-        if(curentLineIndex == index - 48){
-            printf("Found match index: %li\n", index - 48);
+        if(curentLineIndex == index){
+            printf("Found match index: %li\n", index);
             strTemp.clear();
         }
 
