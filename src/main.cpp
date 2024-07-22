@@ -55,10 +55,17 @@ string reminderFile {};
 #include "CURL_helper.h" 
 #include "utils.h" 
 
-void launch_bots(BotVerbose<BotManager, subprocess::popen>& bot1, BotVerbose<BotManager, subprocess::popen>& bot2){
+void launch_bots(BotVerbose<BotManager, subprocess::popen>& bot1, 
+                 BotVerbose<BotManager, subprocess::popen>& bot2,
+                 vector<pair<string,int>>& users_stat,
+                 decltype(std::chrono::high_resolution_clock::now())& start){
+
+    std::cout << "Init bots..." << std::endl;
 
     bot1.init();
     bot2.init();
+
+    std::cout << "Setup bots..." << std::endl;
 
     const auto req_token_weather = bot1.getName() + " погоду";
     const auto req_token_joke = bot1.getName() + " шутку";
@@ -277,14 +284,6 @@ void launch_bots(BotVerbose<BotManager, subprocess::popen>& bot1, BotVerbose<Bot
         }
     }});
 
-    std::future<void> result = std::async(std::launch::async, canary_call<BotManager>, std::ref(bot1));
-    // std::future<void> result2 = std::async(std::launch::async, canary_call<BotManager>, std::ref(bot2));
-
-    srand(time(0)); 
-    auto start = std::chrono::high_resolution_clock::now();
-
-    vector<pair<string,int>> users_stat;
-
     bot1.getEvents().onCommand(CommandManager::get_register()[0].first, [&bot1, &users_stat, &start](Message::Ptr message) {
 
         if(!is_secured_chat(message->chat->title))
@@ -446,6 +445,10 @@ int main() {
         printf("SIGINT got\n");
         exit(0);
     });
+
+    srand(time(0)); 
+    auto start = std::chrono::high_resolution_clock::now();
+    vector<pair<string,int>> users_stat;
  
     while (true) {
         try {
@@ -453,7 +456,9 @@ int main() {
             BotVerbose<BotManager, subprocess::popen> bot2(std::make_shared<Bot>(botToken2), bot2Name, llamaOutput);
             vector<std::reference_wrapper<BotVerbose<BotManager, subprocess::popen>>> bots{bot1, bot2};
 
-            launch_bots(bot1, bot2);
+            launch_bots(bot1, bot2, users_stat, start);
+
+            launch_canary(bot1);
 
             while (true) {
                 for(auto& b: bots){

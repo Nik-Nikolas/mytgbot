@@ -292,6 +292,13 @@ void canary_call(const BotVerbose<BotManagerType, subprocess::popen>& bot) {
     }
 }
 
+void launch_canary(BotVerbose<BotManager, subprocess::popen>& bot){
+    std::cout << "launching canary..." <<std::endl;
+
+    std::future<void> result = std::async(std::launch::async, canary_call<BotManager>, std::ref(bot));
+    // std::future<void> result2 = std::async(std::launch::async, canary_call<BotManager>, std::ref(bot2));
+}
+
 string get_username(Message::Ptr message){
     auto username = message->from->username;
     if(username.empty()){
