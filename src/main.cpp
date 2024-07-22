@@ -55,21 +55,8 @@ string reminderFile {};
 #include "CURL_helper.h" 
 #include "utils.h" 
 
-int main() {
-    setup_paths(pathPrefix, llamaOutput, hexagrammsFile, DBfile, reminderFile);
+void launch_bots(BotVerbose<BotManager, subprocess::popen>& bot1, BotVerbose<BotManager, subprocess::popen>& bot2){
 
-    string botToken1 {};
-    string botToken2{};
-
-    //Aythenticate bots
-    get_token(pathPrefix + "bot_token1", botToken1); // file path_prefix + "bot_token1" should present in binary root dir
-    get_token(pathPrefix + "bot_token2", botToken2);    
-
-    auto silentBot1 = std::make_shared<Bot>(botToken1);
-    auto silentBot2 = std::make_shared<Bot>(botToken2);
-
-    BotVerbose<BotManager, subprocess::popen> bot1(silentBot1, bot1Name, llamaOutput);
-    BotVerbose<BotManager, subprocess::popen> bot2(silentBot2, bot2Name, llamaOutput);
     bot1.init();
     bot2.init();
 
@@ -443,26 +430,41 @@ int main() {
             bot2.processCommand(message->chat->id, req);
         }      
     });
+}
+
+int main() {
+    setup_paths(pathPrefix, llamaOutput, hexagrammsFile, DBfile, reminderFile);
+
+    string botToken1{};
+    string botToken2{};
+
+    //Aythenticate bots
+    get_token(pathPrefix + "bot_token1", botToken1); // file path_prefix + "bot_token1" should present in binary root dir
+    get_token(pathPrefix + "bot_token2", botToken2);    
 
     signal(SIGINT, [](int s) {
         printf("SIGINT got\n");
         exit(0);
     });
  
-    size_t count{0};
-    vector<std::reference_wrapper<BotVerbose<BotManager, subprocess::popen>>> bots{bot1, bot2};
     while (true) {
         try {
+            BotVerbose<BotManager, subprocess::popen> bot1(std::make_shared<Bot>(botToken1), bot1Name, llamaOutput);
+            BotVerbose<BotManager, subprocess::popen> bot2(std::make_shared<Bot>(botToken2), bot2Name, llamaOutput);
+            vector<std::reference_wrapper<BotVerbose<BotManager, subprocess::popen>>> bots{bot1, bot2};
+
+            launch_bots(bot1, bot2);
+
             while (true) {
                 for(auto& b: bots){
                     b.get().startPoll();
-                    cout << b.get().getApi().getMe()->username <<  ": silence=" << b.get().isSilent() << " canary delay=" << b.get().canaryDelay()/3600 << "hr(s). Cycle#=" << count << endl;
+                    cout << b.get().getApi().getMe()->username <<  ": silence=" << b.get().isSilent() << " canary delay=" << b.get().canaryDelay()/3600 << "hr(s). time=" << get_timestamp() << endl;
                 }
-                ++count;
             }
-        } catch (exception& e) {
+        } 
+        catch (exception& e) {
             printf("error: %s\n", e.what());
-            this_thread::sleep_for(1s);
+            this_thread::sleep_for(10s);
         }
     }
 
