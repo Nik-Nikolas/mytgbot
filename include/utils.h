@@ -281,7 +281,7 @@ template<typename BotManagerType>
 void canary_call(const BotVerbose<BotManagerType, subprocess::popen>& bot) {
     while (true) {
         const std::string message {bot.getName() + string(". mode: canary singing") + " delay=" + to_string(bot.canaryDelay()) + " sec."};
-        std::cout << bot.getName() <<  message << std::endl;
+        std::cout << message << std::endl;
         bot.sayWord(message);
 
         bot.sayWord("Текущие напоминания: \n\n" + file_read_enumerate_lines(reminderFile));

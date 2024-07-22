@@ -291,7 +291,7 @@ int main() {
     }});
 
     std::future<void> result = std::async(std::launch::async, canary_call<BotManager>, std::ref(bot1));
-    std::future<void> result2 = std::async(std::launch::async, canary_call<BotManager>, std::ref(bot2));
+    // std::future<void> result2 = std::async(std::launch::async, canary_call<BotManager>, std::ref(bot2));
 
     srand(time(0)); 
     auto start = std::chrono::high_resolution_clock::now();
