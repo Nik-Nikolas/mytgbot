@@ -456,7 +456,7 @@ int main() {
             while (true) {
                 for(auto& b: bots){
                     b.get().startPoll();
-                    cout << b.get().getApi().getMe()->username <<  ": silence=" << b.get().isSilent() << " canary delay=" << b.get().canaryDelay() << "sec. Cycle#=" << count << endl;
+                    cout << b.get().getApi().getMe()->username <<  ": silence=" << b.get().isSilent() << " canary delay=" << b.get().canaryDelay()/3600 << "hr(s). Cycle#=" << count << endl;
                 }
                 ++count;
             }
