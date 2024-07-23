@@ -291,9 +291,9 @@ void canary_call(const BotVerbose<BotManagerType, subprocess::popen>& bot) {
     }
 }
 
-auto& launch_canary(BotVerbose<BotManager, subprocess::popen>& bot){
+const auto& launch_canary(BotVerbose<BotManager, subprocess::popen>& bot){
     std::cout << "launching canary..." <<std::endl;
-    static auto result = std::async(std::launch::async, canary_call<BotManager>, std::ref(bot));
+    static const auto result = std::async(std::launch::async, canary_call<BotManager>, std::ref(bot));
     return result;
 }
 
