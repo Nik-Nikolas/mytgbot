@@ -127,7 +127,8 @@ void launch_bots(BotVerbose<BotManager, subprocess::popen>& bot1,
     bot1.registerCommand({
     req_token_remind, 
     ": напомнит напоминалку",
-    [&](int64_t id, const string& req){        
+    [&](int64_t id, const string& req){    
+        file_sort_lines(reminderFile); //if outer file edition occured- needs sorting
         bot1.sayWord("Текущие напоминания: \n\n" + file_read_enumerate_lines(reminderFile));
     }});
              
