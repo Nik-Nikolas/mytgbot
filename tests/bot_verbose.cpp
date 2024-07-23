@@ -59,7 +59,7 @@ class BotManagerMocked: public BotManager{
 
         MOCK_METHOD(bool, deleteWebhook, (), (override));
         MOCK_METHOD(void, sendMessage, (std::int64_t, const string&), (const, override));
-        MOCK_METHOD(void, sendChatAction, (std::int64_t, const string&), (override));
+        MOCK_METHOD(void, sendChatAction, (std::int64_t, const string&), (const, override));
         MOCK_METHOD(const Api&, getApi, (), (override));
         MOCK_METHOD(EventBroadcaster&, getEvents, (), (override));
         MOCK_METHOD(void, startPoll, (), (override)); 

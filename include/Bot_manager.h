@@ -18,7 +18,7 @@ class BotManager{
             m_bot->getApi().sendMessage(id, message);
         };
 
-        virtual void sendChatAction(std::int64_t id, const string& action) {        
+        virtual void sendChatAction(std::int64_t id, const string& action) const {        
             m_bot->getApi().sendChatAction(id, action);
         };
 

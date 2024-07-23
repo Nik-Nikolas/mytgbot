@@ -34,11 +34,20 @@ class BotVerbose{
                 m_botManager.sendMessage(m_id, word);
         }
 
+        void sayAction(const string& action) const {  
+            if(m_id)
+                m_botManager.sendChatAction(m_id, action);
+        }
+
         void saveID(std::int64_t id){
             if(!m_id)
                 m_botManager.sendMessage(id, m_name + " инициирует ID: " + std::to_string(id));
 
             m_id = id;            
+        }
+
+        std::int64_t getID() const{
+            return m_id;            
         }
 
         void setCanaryDelay(std::int64_t d){
@@ -82,7 +91,7 @@ class BotVerbose{
 
         string startLLM(int64_t chat_id, string request){
 
-            m_botManager.sendChatAction(chat_id, "typing");
+            sayAction("typing");
             
             const auto token_detailed{"детально "s};
             
@@ -109,7 +118,7 @@ class BotVerbose{
 
             string response{};
             while(true){
-                m_botManager.sendChatAction(chat_id, "typing");
+                sayAction("typing");
 
                 ifstream file(getLLMmanager().getOutputFile());
                 std::ostringstream ss;
@@ -224,7 +233,7 @@ class BotVerbose{
         BotManagerType                      m_botManager;
         bool                                m_isSilent{false};
         std::string                         m_name;
-        std::int64_t                        m_id{0};
+        std::int64_t                        m_id{-4114020245};
         std::int64_t                        m_canary_delay_seconds{3600 * 6};
         std::string                         m_llm_file{};
         vector<Command>                     m_commands;

@@ -277,16 +277,22 @@ std::string get_timestamp(){
 }
 
 template<typename BotManagerType>
-void canary_call(const BotVerbose<BotManagerType, subprocess::popen>& bot) {
+void canary_call(BotVerbose<BotManagerType, subprocess::popen>& bot) {
     while (true) {
         const std::string message {bot.getName() + string(". mode: canary singing") + " delay=" + to_string(bot.canaryDelay()/3600) + " hr(s)."};
         std::cout << message << std::endl;
         bot.sayWord(message);
 
         bot.sayWord("Текущие напоминания: \n\n" + file_read_enumerate_lines(reminderFile));
-
+        
+        const auto everySeconds{15};
         for(auto i=0;i<bot.canaryDelay();++i){
             std::this_thread::sleep_for(std::chrono::seconds(1));
+
+            //notify that bot is alive
+            if(i%everySeconds == 0){
+                bot.sayAction("find_location");
+            }
         }
     }
 }
