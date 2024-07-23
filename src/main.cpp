@@ -449,7 +449,8 @@ int main() {
     srand(time(0)); 
     auto start = std::chrono::high_resolution_clock::now();
     vector<pair<string,int>> users_stat;
- 
+    std::future<void> result;
+
     while (true) {
         try {
             BotVerbose<BotManager, subprocess::popen> bot1(std::make_shared<Bot>(botToken1), bot1Name, llamaOutput);
@@ -458,7 +459,7 @@ int main() {
 
             launch_bots(bot1, bot2, users_stat, start);
 
-            launch_canary(bot1);
+            launch_canary(bot1, result);
 
             while (true) {
                 for(auto& b: bots){
