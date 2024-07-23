@@ -67,18 +67,18 @@ void launch_bots(BotVerbose<BotManager, subprocess::popen>& bot1,
 
     std::cout << "Setup bots..." << std::endl;
 
-    const auto req_token_weather = bot1.getName() + " погоду";
-    const auto req_token_joke = bot1.getName() + " шутку";
-    const auto req_token_dialog = bot1.getName() + " " + bot2.getName() + " ";
-    const auto req_token_remember = bot1.getName() + " запомни" + " ";
-    const auto req_token_remind = bot1.getName() + " напомни";
-    const auto req_token_forget = bot1.getName() + " забудь" + " ";
-    const auto req_token_freeze_1 = bot1.getName() + " замри";
-    const auto req_token_start_1 = bot1.getName() + " отомри";
-    const auto req_token_req_1 = bot1.getName() + " скажи" + " ";
-    const auto req_token_search_1 = bot1.getName() + " поищи" + " ";
-    const auto req_token_canary_1 = "/canary="s;
-    const auto req_token_history = bot1.getName() + " историю";
+    const static auto req_token_weather = bot1.getName() + " погоду";
+    const static auto req_token_joke = bot1.getName() + " шутку";
+    const static auto req_token_dialog = bot1.getName() + " " + bot2.getName() + " ";
+    const static auto req_token_remember = bot1.getName() + " запомни" + " ";
+    const static auto req_token_remind = bot1.getName() + " напомни";
+    const static auto req_token_forget = bot1.getName() + " забудь" + " ";
+    const static auto req_token_freeze_1 = bot1.getName() + " замри";
+    const static auto req_token_start_1 = bot1.getName() + " отомри";
+    const static auto req_token_req_1 = bot1.getName() + " скажи" + " ";
+    const static auto req_token_search_1 = bot1.getName() + " поищи" + " ";
+    const static auto req_token_canary_1 = "/canary="s;
+    const static auto req_token_history = bot1.getName() + " историю";
 
     bot1.registerCommand({
     req_token_weather, 
@@ -239,10 +239,10 @@ void launch_bots(BotVerbose<BotManager, subprocess::popen>& bot1,
         bot1.sayWord(s);
     }});
 
-    const auto req_token_freeze_2 = bot2.getName() + " замри";
-    const auto req_token_start_2 = bot2.getName() + " отомри";
-    const auto req_token_req_2 = bot2.getName() + " скажи" + " ";
-    const auto req_token_canary_2 = "/canary="s;
+    const static auto req_token_freeze_2 = bot2.getName() + " замри";
+    const static auto req_token_start_2 = bot2.getName() + " отомри";
+    const static auto req_token_req_2 = bot2.getName() + " скажи" + " ";
+    const static auto req_token_canary_2 = "/canary="s;
 
     bot2.registerCommand({
     req_token_freeze_2,
@@ -451,15 +451,16 @@ int main() {
     vector<pair<string,int>> users_stat;
     std::future<void> result;
 
+    BotVerbose<BotManager, subprocess::popen> bot1(std::make_shared<Bot>(botToken1), bot1Name, llamaOutput);
+    BotVerbose<BotManager, subprocess::popen> bot2(std::make_shared<Bot>(botToken2), bot2Name, llamaOutput);
+    vector<std::reference_wrapper<BotVerbose<BotManager, subprocess::popen>>> bots{bot1, bot2};
+
+    launch_bots(bot1, bot2, users_stat, start);
+    launch_canary(bot1, result);
+
     while (true) {
         try {
-            BotVerbose<BotManager, subprocess::popen> bot1(std::make_shared<Bot>(botToken1), bot1Name, llamaOutput);
-            BotVerbose<BotManager, subprocess::popen> bot2(std::make_shared<Bot>(botToken2), bot2Name, llamaOutput);
-            vector<std::reference_wrapper<BotVerbose<BotManager, subprocess::popen>>> bots{bot1, bot2};
 
-            launch_bots(bot1, bot2, users_stat, start);
-
-            launch_canary(bot1, result);
 
             while (true) {
                 for(auto& b: bots){
