@@ -272,7 +272,6 @@ std::string get_timestamp(){
     time_t seconds = time(NULL);
     tm* timeinfo = localtime(&seconds);
     strcpy((char*)output.data(), asctime(timeinfo));
-    std::cout << output;
 
     return output;
 }
