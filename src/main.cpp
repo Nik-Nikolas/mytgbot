@@ -433,19 +433,19 @@ void launch_bots(BotVerbose<BotManager, subprocess::popen>& bot1,
 }
 
 int main() {
+    signal(SIGINT, [](int s) {
+        printf("SIGINT got\n");
+        exit(0);
+    });
+
     setup_paths(pathPrefix, llamaOutput, hexagrammsFile, DBfile, reminderFile);
 
     string botToken1{};
     string botToken2{};
 
-    //Aythenticate bots
-    get_token(pathPrefix + "bot_token1", botToken1); // file path_prefix + "bot_token1" should present in binary root dir
-    get_token(pathPrefix + "bot_token2", botToken2);    
-
-    signal(SIGINT, [](int s) {
-        printf("SIGINT got\n");
-        exit(0);
-    });
+    //Authenticate bots
+    get_token(pathPrefix + "bot_token1", botToken1); // file path_prefix + "bot_tokenN" should present in binary root dir
+    get_token(pathPrefix + "bot_token2", botToken2);   
 
     srand(time(0)); 
     auto start = std::chrono::high_resolution_clock::now();
@@ -456,12 +456,12 @@ int main() {
     vector<std::reference_wrapper<BotVerbose<BotManager, subprocess::popen>>> bots{bot1, bot2};
 
     launch_bots(bot1, bot2, users_stat, start);
+
+    //Responsible for remind option
     launch_canary(bot1);
 
     while (true) {
         try {
-
-
             while (true) {
                 for(auto& b: bots){
                     b.get().startPoll();
