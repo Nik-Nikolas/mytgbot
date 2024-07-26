@@ -378,7 +378,15 @@ void launch_bots(BotVerbose<BotManager, subprocess::popen>& bot1,
         if(!req.empty()){
             file_write_line(DBfile, username + " : " + req + " : " + get_timestamp());
 
-            bot1.processCommand(message->chat->id, req);
+            if(!bot1.processCommand(message->chat->id, req)){
+
+                std::vector<std::string> hexagramms;
+                prepare_hexagramms(hexagramms);
+
+                bot1.getApi().sendMessage(message->chat->id, 
+                "\nПозволю себе цитату по поводу сказанного вами: \n\n" +
+                select_random_line(hexagramms));
+            }
         }
     });
 

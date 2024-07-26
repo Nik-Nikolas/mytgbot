@@ -181,11 +181,10 @@ class BotVerbose{
             return m_commands;
         }
 
-        void processCommand(int64_t chat_id, const string& req){
-
+        bool processCommand(int64_t chat_id, const string& req){
 
             if(!StringTools::startsWith(req, getName())){
-                return;
+                return false;
             }
 
             auto isRegisteredProcessed{false};
@@ -205,7 +204,11 @@ class BotVerbose{
                     commands.append(el.m_command + el.m_desctipt + "\n");
                 }
                 m_botManager.sendMessage(chat_id, "Bot commands: " + commands); 
+
+                return false;
             }
+
+            return true;
         }
 
         auto& getApi(){
